@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="TreeCorr  documentation" href="index.html" />
-    <link rel="next" title="Changes from version 3.1 to 3.2" href="changes.html" />
+    <link rel="next" title="Changes from version 3.2 to 3.3" href="changes.html" />
     <link rel="prev" title="Celestial Coordinates" href="celestial.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="changes.html" title="Changes from version 3.1 to 3.2"
+          <a href="changes.html" title="Changes from version 3.2 to 3.3"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="celestial.html" title="Celestial Coordinates"
@@ -114,18 +114,29 @@ one will be built according to the config dict&#8217;s verbose level.)</li>
 <p>Also installed with TreeCorr are two executable scripts, called corr2
 and corr3.  The scripts takes one required command-line argument, which
 is the name of a configuration file:</p>
-<div class="highlight-python"><div class="highlight"><pre>corr2 config_file
-corr3 config_file
+<div class="highlight-python"><div class="highlight"><pre>corr2 config.yaml
+corr3 config.yaml
 </pre></div>
 </div>
-<p>A sample configuration file is provided, called sample.params.  See the
-TreeCorr wiki page</p>
+<p>A sample configuration file is provided, called sample_config.yaml.
+See the TreeCorr wiki page</p>
 <p><a class="reference external" href="https://github.com/rmjarvis/TreeCorr/wiki/Configuration-Parameters">https://github.com/rmjarvis/TreeCorr/wiki/Configuration-Parameters</a></p>
 <p>for the complete documentation about the allowed parameters.</p>
+<p>YAML is the recommended format for the configuration file, but we
+also allow JSON files if you prefer, or a legacy format, which is
+like an .ini file, but without the section headings, consisting of
+key = value lines.  The three formats are normally distinguished
+by their extensions (.yaml, .json, or .params respectively), but
+you can also give the file type explicitly with the -f option. E.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre>corr2 my_config_file.txt -f params
+</pre></div>
+</div>
+<p>would specify that the configuration file <tt class="docutils literal"><span class="pre">my_config_file.txt</span></tt> uses
+the legacy &#8220;params&#8221; format.</p>
 <p>You can also specify parameters on the command line after the name of
 the configuration file. e.g.:</p>
-<div class="highlight-python"><div class="highlight"><pre>corr2 config_file file_name=file1.dat gg_file_name=file1.out
-corr2 config_file file_name=file2.dat gg_file_name=file2.out
+<div class="highlight-python"><div class="highlight"><pre>corr2 config.yaml file_name=file1.dat gg_file_name=file1.out
+corr2 config.yaml file_name=file2.dat gg_file_name=file2.out
 ...
 </pre></div>
 </div>
@@ -236,8 +247,8 @@ Otherwise, it just parses</p>
 <dt id="treecorr.config.get_from_list">
 <tt class="descclassname">treecorr.config.</tt><tt class="descname">get_from_list</tt><big>(</big><em>config</em>, <em>key</em>, <em>num</em>, <em>value_type=&lt;type 'str'&gt;</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/treecorr/config.html#get_from_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#treecorr.config.get_from_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>A helper function to get a key from config that is allowed to be a list</p>
-<p>Some of the config values are allowed to be lists of values, in which case we take the 
-<cite>num</cite> item from the list.  If they are not a list, then the given value is used for 
+<p>Some of the config values are allowed to be lists of values, in which case we take the
+<cite>num</cite> item from the list.  If they are not a list, then the given value is used for
 all values of <cite>num</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -313,7 +324,7 @@ Capitalization is ignored.</p>
 the treecorr.angle_units dict.</p>
 <p>The value is allowed to merely start with one of the unit names.  So &#8216;deg&#8217;, &#8216;degree&#8217;,
 &#8216;degrees&#8217; all convert to &#8216;deg&#8217; which is the key in the angle_units dict.
-The return value in this case would be treecorr.angle_units[&#8216;deg&#8217;], which has the 
+The return value in this case would be treecorr.angle_units[&#8216;deg&#8217;], which has the
 value pi/180.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -363,13 +374,21 @@ See check_config for the structure of the params dict.</p>
 
 <dl class="function">
 <dt id="treecorr.config.read_config">
-<tt class="descclassname">treecorr.config.</tt><tt class="descname">read_config</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/treecorr/config.html#read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#treecorr.config.read_config" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">treecorr.config.</tt><tt class="descname">read_config</tt><big>(</big><em>file_name</em>, <em>file_type='auto'</em><big>)</big><a class="reference internal" href="_modules/treecorr/config.html#read_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#treecorr.config.read_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a configuration dict from a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> &#8211; The file name from which the configuration dict should be read.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_name</strong> &#8211; The file name from which the configuration dict should be read.</li>
+<li><strong>file_type</strong> &#8211; The type of config file.  Options are &#8216;auto&#8217;, &#8216;yaml&#8217;, &#8216;json&#8217;, &#8216;params&#8217;.
+(default: &#8216;auto&#8217;, which tries to determine the type from the extension)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A config dict built from the configuration file.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -449,7 +468,7 @@ If omitted or None, then output to stdout.</li>
                         title="previous chapter">Celestial Coordinates</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="changes.html"
-                        title="next chapter">Changes from version 3.1 to 3.2</a></p>
+                        title="next chapter">Changes from version 3.2 to 3.3</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/corr2.txt"
@@ -482,7 +501,7 @@ If omitted or None, then output to stdout.</li>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="changes.html" title="Changes from version 3.1 to 3.2"
+          <a href="changes.html" title="Changes from version 3.2 to 3.3"
              >next</a> |</li>
         <li class="right" >
           <a href="celestial.html" title="Celestial Coordinates"

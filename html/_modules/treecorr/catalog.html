@@ -117,10 +117,13 @@
 
 <span class="sd">    A Catalog object will have available the following attributes:</span>
 
-<span class="sd">        :x:      The x positions, if defined, as a numpy array. (None otherwise)</span>
-<span class="sd">        :y:      The y positions, if defined, as a numpy array. (None otherwise)</span>
-<span class="sd">        :ra:     The right ascension, if defined, as a numpy array. (None otherwise)</span>
-<span class="sd">        :dec:    The declination, if defined, as a numpy array. (None otherwise)</span>
+<span class="sd">        :x:      The x positions, if defined, as a numpy array (converted to radians if x_units</span>
+<span class="sd">                 was given). (None otherwise)</span>
+<span class="sd">        :y:      The y positions, if defined, as a numpy array (converted to radians if y_units</span>
+<span class="sd">                 was given). (None otherwise)</span>
+<span class="sd">        :z:      The z positions, if defined, as a numpy array. (None otherwise)</span>
+<span class="sd">        :ra:     The right ascension, if defined, as a numpy array (in radians). (None otherwise)</span>
+<span class="sd">        :dec:    The declination, if defined, as a numpy array (in radians). (None otherwise)</span>
 <span class="sd">        :r:      The distance, if defined, as a numpy array. (None otherwise)</span>
 <span class="sd">        :w:      The weights, as a numpy array. (All 1&#39;s if no weight column provided.)</span>
 <span class="sd">        :wpos:   The weights for position centroiding, as a numpy array.  (All 1&#39;s if neither</span>
@@ -232,10 +235,6 @@
 <span class="sd">                        arcsec, arcmin, degrees, hours, radians.  (default: radians, although </span>
 <span class="sd">                        with (x,y) positions, you can often just ignore the units, and the output</span>
 <span class="sd">                        separations will be in whatever units x and y are in.)</span>
-<span class="sd">    :param z_units:     The units to use for the z values, given as a string.  Valid options are</span>
-<span class="sd">                        arcsec, arcmin, degrees, hours, radians.  (default: radians, although </span>
-<span class="sd">                        when using x,y,z, it really doesn&#39;t make much sense to apply units, so</span>
-<span class="sd">                        you probably don&#39;t want to use this parameter.)</span>
 <span class="sd">    :param ra_units:    The units to use for the ra values, given as a string.  Valid options are</span>
 <span class="sd">                        arcsec, arcmin, degrees, hours, radians. (required when using ra_col or</span>
 <span class="sd">                        providing ra directly)</span>
@@ -302,18 +301,8 @@
 <span class="sd">                        - median: Use the median of the coordinate being split.</span>
 <span class="sd">                        - middle: Use the middle of the range; i.e. the average of the minimum and</span>
 <span class="sd">                          maximum value.</span>
-
-<span class="sd">    :param metric:      Which metric to use for distance measurements.  Options are:</span>
-
-<span class="sd">                        - &#39;Euclidean&#39; = straight line Euclidean distance between two points.</span>
-<span class="sd">                          For spherical coordinates (ra,dec without r), this is the chord</span>
-<span class="sd">                          distance between points on the unit sphere.</span>
-<span class="sd">                        - &#39;Rperp&#39; = the perpendicular component of the distance. For two points</span>
-<span class="sd">                          with distance from Earth `r1, r2`, if `d` is the normal Euclidean </span>
-<span class="sd">                          distance and :math:`Rparallel = |r1-r2|`, then we define</span>
-<span class="sd">                          :math:`Rperp^2 = d^2 - Rparallel^2`.</span>
-
-<span class="sd">                        (default: &#39;Euclidean&#39;)</span>
+<span class="sd">                        - random: Use a random point somewhere in the middle two quartiles of the</span>
+<span class="sd">                          range. </span>
 
 <span class="sd">    :param cat_precision: The precision to use when writing a Catalog to an ASCII file. This should</span>
 <span class="sd">                        be an integer, which specifies how many digits to write. (default: 16)</span>
@@ -353,8 +342,6 @@
                 <span class="s">&#39;The units of x values.&#39;</span><span class="p">),</span>
         <span class="s">&#39;y_units&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">angle_units</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                 <span class="s">&#39;The units of y values.&#39;</span><span class="p">),</span>
-        <span class="s">&#39;z_units&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">angle_units</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-                <span class="s">&#39;The units of z values.&#39;</span><span class="p">),</span>
         <span class="s">&#39;ra_units&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">angle_units</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                 <span class="s">&#39;The units of ra values. Required when using ra_col.&#39;</span><span class="p">),</span>
         <span class="s">&#39;dec_units&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">angle_units</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
@@ -411,10 +398,8 @@
         <span class="s">&#39;log_file&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s">&#39;If desired, an output file for the logging output.&#39;</span><span class="p">,</span>
                 <span class="s">&#39;The default is to write the output to stdout.&#39;</span><span class="p">),</span>
-        <span class="s">&#39;split_method&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;mean&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;mean&#39;</span><span class="p">,</span> <span class="s">&#39;median&#39;</span><span class="p">,</span> <span class="s">&#39;middle&#39;</span><span class="p">],</span>
+        <span class="s">&#39;split_method&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;mean&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;mean&#39;</span><span class="p">,</span> <span class="s">&#39;median&#39;</span><span class="p">,</span> <span class="s">&#39;middle&#39;</span><span class="p">,</span> <span class="s">&#39;random&#39;</span><span class="p">],</span>
                 <span class="s">&#39;Which method to use for splitting cells.&#39;</span><span class="p">),</span>
-        <span class="s">&#39;metric&#39;</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;Euclidean&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Euclidean&#39;</span><span class="p">,</span> <span class="s">&#39;Rperp&#39;</span><span class="p">],</span>
-                <span class="s">&#39;Which metric to use for the distance measurements&#39;</span><span class="p">),</span>
         <span class="s">&#39;cat_precision&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s">&#39;The number of digits after the decimal in the output.&#39;</span><span class="p">),</span>
     <span class="p">}</span>
@@ -520,9 +505,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">y_units</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;y_units&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;radians&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_units</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_units</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">z_units</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;z_units&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;radians&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_units</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ra_units&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;ra_units is required when using ra, dec&quot;</span><span class="p">)</span>
@@ -690,7 +672,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="s">&#39;3d&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_units</span> <span class="o">=</span> <span class="mf">1.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_units</span> <span class="o">=</span> <span class="mf">1.</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="s">&#39;flat&#39;</span>
@@ -864,8 +846,6 @@
         <span class="c"># Read g1,g2</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">g1_col</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">g2_col</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">g1_col</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">g1_col</span> <span class="o">&gt;</span> <span class="n">ncols</span> <span class="ow">or</span> <span class="n">g2_col</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">g2_col</span> <span class="o">&gt;</span> <span class="n">ncols</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s">&#39;g1_col, g2_col = &#39;</span><span class="p">,</span><span class="n">g1_col</span><span class="p">,</span> <span class="n">g2_col</span><span class="p">)</span>
-                <span class="k">print</span><span class="p">(</span><span class="s">&#39;ncols = &#39;</span><span class="p">,</span><span class="n">ncols</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">isGColRequired</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orig_config</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;g1_col, g2_col are invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -900,6 +880,8 @@
 
 <span class="sd">        :param is_rand:     Is this a random catalog? (default: False)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">fitsio</span>
+
         <span class="c"># Get the column names</span>
         <span class="n">x_col</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;x_col&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;0&#39;</span><span class="p">)</span>
         <span class="n">y_col</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;y_col&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;0&#39;</span><span class="p">)</span>
@@ -948,41 +930,6 @@
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;g1_col, g2_col are invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
 
         <span class="c"># OK, now go ahead and read all the columns.</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_fitsio</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">is_rand</span><span class="p">,</span>
-                             <span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">,</span> <span class="n">z_col</span><span class="p">,</span> <span class="n">ra_col</span><span class="p">,</span> <span class="n">dec_col</span><span class="p">,</span> <span class="n">r_col</span><span class="p">,</span> <span class="n">w_col</span><span class="p">,</span> <span class="n">wpos_col</span><span class="p">,</span> <span class="n">flag_col</span><span class="p">,</span>
-                             <span class="n">g1_col</span><span class="p">,</span> <span class="n">g2_col</span><span class="p">,</span> <span class="n">k_col</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">read_pyfits</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">is_rand</span><span class="p">,</span>
-                             <span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">,</span> <span class="n">z_col</span><span class="p">,</span> <span class="n">ra_col</span><span class="p">,</span> <span class="n">dec_col</span><span class="p">,</span> <span class="n">r_col</span><span class="p">,</span> <span class="n">w_col</span><span class="p">,</span> <span class="n">wpos_col</span><span class="p">,</span> <span class="n">flag_col</span><span class="p">,</span>
-                             <span class="n">g1_col</span><span class="p">,</span> <span class="n">g2_col</span><span class="p">,</span> <span class="n">k_col</span><span class="p">)</span>
-
-
-    <span class="k">def</span> <span class="nf">read_fitsio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">is_rand</span><span class="p">,</span>
-                    <span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">,</span> <span class="n">z_col</span><span class="p">,</span> <span class="n">ra_col</span><span class="p">,</span> <span class="n">dec_col</span><span class="p">,</span> <span class="n">r_col</span><span class="p">,</span> <span class="n">w_col</span><span class="p">,</span> <span class="n">wpos_col</span><span class="p">,</span> <span class="n">flag_col</span><span class="p">,</span>
-                    <span class="n">g1_col</span><span class="p">,</span> <span class="n">g2_col</span><span class="p">,</span> <span class="n">k_col</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Read the catalog from a FITS file using the fitsio package</span>
-
-<span class="sd">        This is normally not called directly.  Use :meth:`~treecorr.Catalog.read_fits` instead.</span>
-
-<span class="sd">        :param file_name:   The name of the file to read in.</span>
-<span class="sd">        :param num:         Which number catalog are we reading.</span>
-<span class="sd">        :param is_rand:     Is this a random catalog?</span>
-<span class="sd">        :param x_col:       The name for x_col</span>
-<span class="sd">        :param y_col:       The name for y_col</span>
-<span class="sd">        :param z_col:       The name for z_col</span>
-<span class="sd">        :param ra_col:      The name for ra_col</span>
-<span class="sd">        :param dec_col:     The name for dec_col</span>
-<span class="sd">        :param r_col:       The name for r_col</span>
-<span class="sd">        :param w_col:       The name for w_col</span>
-<span class="sd">        :param wpos_col:    The name for wpos_col</span>
-<span class="sd">        :param flag_col:    The name for flat_col</span>
-<span class="sd">        :param g1_col:      The name for g1_col</span>
-<span class="sd">        :param g2_col:      The name for g2_col</span>
-<span class="sd">        :param k_col:       The name for k_col</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">fitsio</span>
-
         <span class="n">hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">fitsio</span><span class="o">.</span><span class="n">FITS</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fits</span><span class="p">:</span>
@@ -1082,157 +1029,15 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read k = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">))</span>
 
  
-    <span class="k">def</span> <span class="nf">read_pyfits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">is_rand</span><span class="p">,</span>
-                    <span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">,</span> <span class="n">z_col</span><span class="p">,</span> <span class="n">ra_col</span><span class="p">,</span> <span class="n">dec_col</span><span class="p">,</span> <span class="n">r_col</span><span class="p">,</span> <span class="n">w_col</span><span class="p">,</span> <span class="n">wpos_col</span><span class="p">,</span> <span class="n">flag_col</span><span class="p">,</span>
-                    <span class="n">g1_col</span><span class="p">,</span> <span class="n">g2_col</span><span class="p">,</span> <span class="n">k_col</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Read the catalog from a FITS file using the pyfits or astropy.io package</span>
-
-<span class="sd">        This is normally not called directly.  Use :meth:`~treecorr.Catalog.read_fits` instead.</span>
-
-<span class="sd">        :param file_name:   The name of the file to read in.</span>
-<span class="sd">        :param num:         Which number catalog are we reading.</span>
-<span class="sd">        :param is_rand:     Is this a random catalog?</span>
-<span class="sd">        :param x_col:       The name for x_col</span>
-<span class="sd">        :param y_col:       The name for y_col</span>
-<span class="sd">        :param z_col:       The name for z_col</span>
-<span class="sd">        :param ra_col:      The name for ra_col</span>
-<span class="sd">        :param dec_col:     The name for dec_col</span>
-<span class="sd">        :param r_col:       The name for r_col</span>
-<span class="sd">        :param w_col:       The name for w_col</span>
-<span class="sd">        :param wpos_col:    The name for wpos_col</span>
-<span class="sd">        :param flag_col:    The name for flat_col</span>
-<span class="sd">        :param g1_col:      The name for g1_col</span>
-<span class="sd">        :param g2_col:      The name for g2_col</span>
-<span class="sd">        :param k_col:       The name for k_col</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">astropy.io.fits</span> <span class="kn">as</span> <span class="nn">pyfits</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">pyfits</span>
-
-        <span class="k">with</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;readonly&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdu_list</span><span class="p">:</span>
-
-            <span class="n">hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-
-            <span class="c"># Read x,y or ra,dec,r</span>
-            <span class="k">if</span> <span class="n">x_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span> <span class="ow">or</span> <span class="n">y_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                <span class="n">x_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;x_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="n">y_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;y_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">x_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">x_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;x_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">y_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">y_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;y_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">x_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">x_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read x = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">y_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">y_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read y = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">z_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                    <span class="n">z_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;z_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">z_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">z_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;z_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">z_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">z_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read z = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">ra_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span> <span class="ow">or</span> <span class="n">dec_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                <span class="n">ra_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;ra_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="n">dec_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;dec_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">ra_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">ra_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;ra_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">dec_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">dec_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;dec_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ra</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">ra_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">ra_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read ra = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ra</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dec</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">dec_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">dec_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read dec = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dec</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">r_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                    <span class="n">r_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;r_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">r_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">r_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;r_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">r_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">r_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read r = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">))</span>
-
-            <span class="c"># Read w</span>
-            <span class="k">if</span> <span class="n">w_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                <span class="n">w_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;w_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">w_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">w_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;w_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">w_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">w_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read w = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">))</span>
-
-            <span class="c"># Read wpos</span>
-            <span class="k">if</span> <span class="n">wpos_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                <span class="n">wpos_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;wpos_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">wpos_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">wpos_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;wpos_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">wpos</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">wpos_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">wpos_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read wpos = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wpos</span><span class="p">))</span>
-
-            <span class="c"># Read flag</span>
-            <span class="k">if</span> <span class="n">flag_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                <span class="n">flag_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;flag_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">flag_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">flag_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;flag_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">flag_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">flag_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read flag = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">))</span>
-
-            <span class="c"># Return here if this file is a random catalog</span>
-            <span class="k">if</span> <span class="n">is_rand</span><span class="p">:</span> <span class="k">return</span>
-
-            <span class="c"># Read g1,g2</span>
-            <span class="k">if</span> <span class="n">g1_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                <span class="n">g1_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;g1_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="n">g2_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;g2_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">g1_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">g1_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span> <span class="ow">or</span>
-                    <span class="n">g2_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">g2_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">isGColRequired</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orig_config</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
-                        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;g1_col, g2_col are invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Warning: skipping g1_col, g2_col for </span><span class="si">%s</span><span class="s">, num=</span><span class="si">%d</span><span class="s">&quot;</span><span class="p">,</span>
-                                        <span class="n">file_name</span><span class="p">,</span><span class="n">num</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;because they are invalid, but unneeded.&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">g1</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">g1_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">g1_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read g1 = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g1</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">g2</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">g2_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">g2_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read g2 = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g2</span><span class="p">))</span>
-
-            <span class="c"># Read k</span>
-            <span class="k">if</span> <span class="n">k_col</span> <span class="o">!=</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
-                <span class="n">k_hdu</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;k_hdu&#39;</span><span class="p">,</span><span class="n">num</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="n">hdu</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">k_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">k_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">isKColRequired</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orig_config</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
-                        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;k_col is invalid for file </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_name</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Warning: skipping k_col for </span><span class="si">%s</span><span class="s">, num=</span><span class="si">%d</span><span class="s">&quot;</span><span class="p">,</span><span class="n">file_name</span><span class="p">,</span><span class="n">num</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;because it is invalid, but unneeded.&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">hdu_list</span><span class="p">[</span><span class="n">k_hdu</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">k_col</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;read k = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">))</span>
-
-
-    <span class="k">def</span> <span class="nf">getNField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_top</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                  <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getNField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_top</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return an NField based on the positions in this catalog.</span>
 
 <span class="sd">        The NField object is cached, so this is efficient to call multiple times.</span>
 
-<span class="sd">        :param min_sep:     The minimum separation between points that will be needed.</span>
-<span class="sd">        :param max_sep:     The maximum separation between points that will be needed.</span>
-<span class="sd">        :param b:           The b parameter that will be used for the correlation function.</span>
-<span class="sd">                            This should be bin_size * bin_slop.</span>
-<span class="sd">        :param split_method: Which split method to use (&#39;mean&#39;, &#39;median&#39;, or &#39;middle&#39;)</span>
+<span class="sd">        :param min_size:    The minimum radius cell required (usually min_sep).</span>
+<span class="sd">        :param max_size:    The maximum radius cell required (usually max_sep).</span>
+<span class="sd">        :param split_method: Which split method to use (&#39;mean&#39;, &#39;median&#39;, &#39;middle&#39;, or &#39;random&#39;)</span>
 <span class="sd">                            (default: &#39;mean&#39;; this value can also be given in the Catalog </span>
-<span class="sd">                            constructor in the config dict.)</span>
-<span class="sd">        :param metric:      Which metric to use for distance measurements.  Options are:</span>
-
-<span class="sd">                            - &#39;Euclidean&#39; = straight line Euclidean distance between two points.</span>
-<span class="sd">                              For spherical coordinates (ra,dec without r), this is the chord</span>
-<span class="sd">                              distance between points on the unit sphere.</span>
-<span class="sd">                            - &#39;Rperp&#39; = the perpendicular component of the distance. For two points</span>
-<span class="sd">                              with distance from Earth `r1, r2`, if `d` is the normal Euclidean </span>
-<span class="sd">                              distance and :math:`Rparallel = |r1-r2|`, then we define</span>
-<span class="sd">                              :math:`Rperp^2 = d^2 - Rparallel^2`.</span>
-
-<span class="sd">                            (default: &#39;Euclidean&#39;; this value can also be given in the Catalog </span>
 <span class="sd">                            constructor in the config dict.)</span>
 <span class="sd">        :param max_top:     The maximum number of top layers to use when setting up the</span>
 <span class="sd">                            field. (default: 10)</span>
@@ -1242,9 +1047,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">split_method</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">split_method</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;split_method&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;mean&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">metric</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;metric&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;Euclidean&#39;</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">split_method</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">max_top</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">split_method</span><span class="p">,</span> <span class="n">max_top</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfields</span><span class="p">:</span>
             <span class="n">nfield</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfields</span><span class="p">[</span><span class="n">args</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1255,32 +1058,16 @@
         <span class="k">return</span> <span class="n">nfield</span>
 
 
-    <span class="k">def</span> <span class="nf">getKField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_top</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                  <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getKField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_top</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a KField based on the k values in this catalog.</span>
 
 <span class="sd">        The KField object is cached, so this is efficient to call multiple times.</span>
 
-<span class="sd">        :param min_sep:     The minimum separation between points that will be needed.</span>
-<span class="sd">        :param max_sep:     The maximum separation between points that will be needed.</span>
-<span class="sd">        :param b:           The b parameter that will be used for the correlation function.</span>
-<span class="sd">                            This should be bin_size * bin_slop.</span>
-<span class="sd">        :param split_method: Which split method to use (&#39;mean&#39;, &#39;median&#39;, or &#39;middle&#39;)</span>
+<span class="sd">        :param min_size:    The minimum radius cell required (usually min_sep).</span>
+<span class="sd">        :param max_size:    The maximum radius cell required (usually max_sep).</span>
+<span class="sd">        :param split_method: Which split method to use (&#39;mean&#39;, &#39;median&#39;, &#39;middle&#39;, or &#39;random&#39;)</span>
 <span class="sd">                            (default: &#39;mean&#39;; this value can also be given in the Catalog </span>
 <span class="sd">                            constructor in the config dict.)</span>
-<span class="sd">        :param metric:      Which metric to use for distance measurements.  Options are:</span>
-
-<span class="sd">                            - &#39;Euclidean&#39; = straight line Euclidean distance between two points.</span>
-<span class="sd">                              For spherical coordinates (ra,dec without r), this is the chord</span>
-<span class="sd">                              distance between points on the unit sphere.</span>
-<span class="sd">                            - &#39;Rperp&#39; = the perpendicular component of the distance. For two points</span>
-<span class="sd">                              with distance from Earth `r1, r2`, if `d` is the normal Euclidean </span>
-<span class="sd">                              distance and :math:`Rparallel = |r1-r2|`, then we define</span>
-<span class="sd">                              :math:`Rperp^2 = d^2 - Rparallel^2`.</span>
-
-<span class="sd">                            (default: &#39;Euclidean&#39;; this value can also be given in the Catalog </span>
-<span class="sd">                            constructor in the config dict.)</span>
-
 <span class="sd">        :param max_top:     The maximum number of top layers to use when setting up the</span>
 <span class="sd">                            field. (default: 10)</span>
 <span class="sd">        :param logger:      A logger file if desired (default: self.logger)</span>
@@ -1289,9 +1076,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">split_method</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">split_method</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;split_method&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;mean&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">metric</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;metric&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;Euclidean&#39;</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">split_method</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">max_top</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">split_method</span><span class="p">,</span> <span class="n">max_top</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kfields</span><span class="p">:</span>
             <span class="n">kfield</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kfields</span><span class="p">[</span><span class="n">args</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1304,32 +1089,16 @@
         <span class="k">return</span> <span class="n">kfield</span>
 
 
-    <span class="k">def</span> <span class="nf">getGField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_top</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                  <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getGField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">split_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">max_top</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a GField based on the g1,g2 values in this catalog.</span>
 
 <span class="sd">        The GField object is cached, so this is efficient to call multiple times.</span>
 
-<span class="sd">        :param min_sep:     The minimum separation between points that will be needed.</span>
-<span class="sd">        :param max_sep:     The maximum separation between points that will be needed.</span>
-<span class="sd">        :param b:           The b parameter that will be used for the correlation function.</span>
-<span class="sd">                            This should be bin_size * bin_slop.</span>
-<span class="sd">        :param split_method: Which split method to use (&#39;mean&#39;, &#39;median&#39;, or &#39;middle&#39;)</span>
+<span class="sd">        :param min_size:    The minimum radius cell required (usually min_sep).</span>
+<span class="sd">        :param max_size:    The maximum radius cell required (usually max_sep).</span>
+<span class="sd">        :param split_method: Which split method to use (&#39;mean&#39;, &#39;median&#39;, &#39;middle&#39;, or &#39;random&#39;)</span>
 <span class="sd">                            (default: &#39;mean&#39;; this value can also be given in the Catalog </span>
 <span class="sd">                            constructor in the config dict.)</span>
-<span class="sd">        :param metric:      Which metric to use for distance measurements.  Options are:</span>
-
-<span class="sd">                            - &#39;Euclidean&#39; = straight line Euclidean distance between two points.</span>
-<span class="sd">                              For spherical coordinates (ra,dec without r), this is the chord</span>
-<span class="sd">                              distance between points on the unit sphere.</span>
-<span class="sd">                            - &#39;Rperp&#39; = the perpendicular component of the distance. For two points</span>
-<span class="sd">                              with distance from Earth `r1, r2`, if `d` is the normal Euclidean </span>
-<span class="sd">                              distance and :math:`Rparallel = |r1-r2|`, then we define</span>
-<span class="sd">                              :math:`Rperp^2 = d^2 - Rparallel^2`.</span>
-
-<span class="sd">                            (default: &#39;Euclidean&#39;; this value can also be given in the Catalog </span>
-<span class="sd">                            constructor in the config dict.)</span>
-
 <span class="sd">        :param max_top:     The maximum number of top layers to use when setting up the</span>
 <span class="sd">                            field. (default: 10)</span>
 <span class="sd">        :param logger:      A logger file if desired (default: self.logger)</span>
@@ -1338,9 +1107,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">split_method</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">split_method</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;split_method&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;mean&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">metric</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;metric&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;Euclidean&#39;</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">split_method</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">max_top</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_size</span><span class="p">,</span> <span class="n">max_size</span><span class="p">,</span> <span class="n">split_method</span><span class="p">,</span> <span class="n">max_top</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gfields</span><span class="p">:</span>
             <span class="n">gfield</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gfields</span><span class="p">[</span><span class="n">args</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1353,31 +1120,16 @@
         <span class="k">return</span> <span class="n">gfield</span>
 
 
-    <span class="k">def</span> <span class="nf">getNSimpleField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getNSimpleField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return an NSimpleField based on the positions in this catalog.</span>
 
 <span class="sd">        The NSimpleField object is cached, so this is efficient to call multiple times.</span>
-
-<span class="sd">        :param metric:      Which metric to use for distance measurements.  Options are:</span>
-
-<span class="sd">                            - &#39;Euclidean&#39; = straight line Euclidean distance between two points.</span>
-<span class="sd">                              For spherical coordinates (ra,dec without r), this is the chord</span>
-<span class="sd">                              distance between points on the unit sphere.</span>
-<span class="sd">                            - &#39;Rperp&#39; = the perpendicular component of the distance. For two points</span>
-<span class="sd">                              with distance from Earth `r1, r2`, if `d` is the normal Euclidean </span>
-<span class="sd">                              distance and :math:`Rparallel = |r1-r2|`, then we define</span>
-<span class="sd">                              :math:`Rperp^2 = d^2 - Rparallel^2`.</span>
-
-<span class="sd">                            (default: &#39;Euclidean&#39;; this value can also be given in the Catalog </span>
-<span class="sd">                            constructor in the config dict.)</span>
 
 <span class="sd">        :param logger:      A logger file if desired (default: self.logger)</span>
 
 <span class="sd">        :returns:           A :class:`~treecorr.NSimpleField` object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">metric</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;metric&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;Euclidean&#39;</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsimplefields</span><span class="p">:</span>
             <span class="n">nsimplefield</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsimplefields</span><span class="p">[</span><span class="n">args</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1387,31 +1139,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsimplefield</span>
 
 
-    <span class="k">def</span> <span class="nf">getKSimpleField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getKSimpleField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a KSimpleField based on the k values in this catalog.</span>
 
 <span class="sd">        The KSimpleField object is cached, so this is efficient to call multiple times.</span>
-
-<span class="sd">        :param metric:      Which metric to use for distance measurements.  Options are:</span>
-
-<span class="sd">                            - &#39;Euclidean&#39; = straight line Euclidean distance between two points.</span>
-<span class="sd">                              For spherical coordinates (ra,dec without r), this is the chord</span>
-<span class="sd">                              distance between points on the unit sphere.</span>
-<span class="sd">                            - &#39;Rperp&#39; = the perpendicular component of the distance. For two points</span>
-<span class="sd">                              with distance from Earth `r1, r2`, if `d` is the normal Euclidean </span>
-<span class="sd">                              distance and :math:`Rparallel = |r1-r2|`, then we define</span>
-<span class="sd">                              :math:`Rperp^2 = d^2 - Rparallel^2`.</span>
-
-<span class="sd">                            (default: &#39;Euclidean&#39;; this value can also be given in the Catalog </span>
-<span class="sd">                            constructor in the config dict.)</span>
 
 <span class="sd">        :param logger:      A logger file if desired (default: self.logger)</span>
 
 <span class="sd">        :returns:           A :class:`~treecorr.KSimpleField` object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">metric</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;metric&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;Euclidean&#39;</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ksimplefields</span><span class="p">:</span>
             <span class="n">ksimplefield</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ksimplefields</span><span class="p">[</span><span class="n">args</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1421,31 +1158,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ksimplefield</span>
 
 
-    <span class="k">def</span> <span class="nf">getGSimpleField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getGSimpleField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a GSimpleField based on the g1,g2 values in this catalog.</span>
 
 <span class="sd">        The GSimpleField object is cached, so this is efficient to call multiple times.</span>
-
-<span class="sd">        :param metric:      Which metric to use for distance measurements.  Options are:</span>
-
-<span class="sd">                            - &#39;Euclidean&#39; = straight line Euclidean distance between two points.</span>
-<span class="sd">                              For spherical coordinates (ra,dec without r), this is the chord</span>
-<span class="sd">                              distance between points on the unit sphere.</span>
-<span class="sd">                            - &#39;Rperp&#39; = the perpendicular component of the distance. For two points</span>
-<span class="sd">                              with distance from Earth `r1, r2`, if `d` is the normal Euclidean </span>
-<span class="sd">                              distance and :math:`Rparallel = |r1-r2|`, then we define</span>
-<span class="sd">                              :math:`Rperp^2 = d^2 - Rparallel^2`.</span>
-
-<span class="sd">                            (default: &#39;Euclidean&#39;; this value can also be given in the Catalog </span>
-<span class="sd">                            constructor in the config dict.)</span>
 
 <span class="sd">        :param logger:      A logger file if desired (default: self.logger)</span>
 
 <span class="sd">        :returns:           A :class:`~treecorr.GSimpleField` object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">metric</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span><span class="s">&#39;metric&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">,</span><span class="s">&#39;Euclidean&#39;</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gsimplefields</span><span class="p">:</span>
             <span class="n">gsimplefield</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gsimplefields</span><span class="p">[</span><span class="n">args</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1509,7 +1231,7 @@
             <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_units</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">col_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;z&#39;</span><span class="p">)</span>
-                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_units</span><span class="p">)</span>
+                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nontrivial_w</span><span class="p">:</span>
             <span class="n">col_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
             <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>

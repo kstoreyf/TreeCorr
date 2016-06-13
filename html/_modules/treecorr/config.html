@@ -68,7 +68,7 @@
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">treecorr</span>
-<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">future.utils</span>
 
 
 <div class="viewcode-block" id="parse_variable"><a class="viewcode-back" href="../../corr2.html#treecorr.config.parse_variable">[docs]</a><span class="k">def</span> <span class="nf">parse_variable</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
@@ -85,14 +85,17 @@
     <span class="c"># Cut off any trailing comment</span>
     <span class="k">if</span> <span class="s">&#39;#&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span> <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;{&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;{&#39;</span><span class="p">,</span><span class="s">&#39;[&#39;</span><span class="p">,</span><span class="s">&#39;(&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;}&#39;</span><span class="p">,</span><span class="s">&#39;]&#39;</span><span class="p">,</span><span class="s">&#39;)&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;List symbol </span><span class="si">%s</span><span class="s"> not properly matched&#39;</span><span class="o">%</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span> <span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span> <span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="c"># on whitespace</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
 
 </div>
 <div class="viewcode-block" id="parse_bool"><a class="viewcode-back" href="../../corr2.html#treecorr.config.parse_bool">[docs]</a><span class="k">def</span> <span class="nf">parse_bool</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -132,7 +135,7 @@
 
 <span class="sd">    The value is allowed to merely start with one of the unit names.  So &#39;deg&#39;, &#39;degree&#39;,</span>
 <span class="sd">    &#39;degrees&#39; all convert to &#39;deg&#39; which is the key in the angle_units dict.</span>
-<span class="sd">    The return value in this case would be treecorr.angle_units[&#39;deg&#39;], which has the </span>
+<span class="sd">    The return value in this case would be treecorr.angle_units[&#39;deg&#39;], which has the</span>
 <span class="sd">    value pi/180.</span>
 
 <span class="sd">    :param value:   The unit as a string value to parse.</span>
@@ -144,11 +147,43 @@
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Unable to parse </span><span class="si">%s</span><span class="s"> as an angle unit&quot;</span><span class="o">%</span><span class="n">value</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="read_config"><a class="viewcode-back" href="../../corr2.html#treecorr.config.read_config">[docs]</a><span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<div class="viewcode-block" id="read_config"><a class="viewcode-back" href="../../corr2.html#treecorr.config.read_config">[docs]</a><span class="k">def</span> <span class="nf">read_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s">&#39;auto&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read a configuration dict from a file.</span>
 
 <span class="sd">    :param file_name:   The file name from which the configuration dict should be read.</span>
+<span class="sd">    :param file_type:   The type of config file.  Options are &#39;auto&#39;, &#39;yaml&#39;, &#39;json&#39;, &#39;params&#39;.</span>
+<span class="sd">                        (default: &#39;auto&#39;, which tries to determine the type from the extension)</span>
+
+<span class="sd">    :returns:           A config dict built from the configuration file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s">&#39;auto&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.yaml&#39;</span><span class="p">):</span> <span class="n">file_type</span> <span class="o">=</span> <span class="s">&#39;yaml&#39;</span>
+        <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.json&#39;</span><span class="p">):</span> <span class="n">file_type</span> <span class="o">=</span> <span class="s">&#39;json&#39;</span>
+        <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.params&#39;</span><span class="p">):</span> <span class="n">file_type</span> <span class="o">=</span> <span class="s">&#39;params&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Unable to determine the type of config file from the extension&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s">&#39;yaml&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">read_yaml_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s">&#39;json&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s">&#39;params&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">read_params_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Invalid file_type </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">file_type</span><span class="p">)</span>
+</div>
+<span class="k">def</span> <span class="nf">read_yaml_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">yaml</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fin</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+<span class="k">def</span> <span class="nf">read_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fin</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+<span class="k">def</span> <span class="nf">read_params_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
     <span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
@@ -162,7 +197,7 @@
                 <span class="n">parse_variable</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">config</span>
 
-</div>
+
 <div class="viewcode-block" id="setup_logger"><a class="viewcode-back" href="../../corr2.html#treecorr.config.setup_logger">[docs]</a><span class="k">def</span> <span class="nf">setup_logger</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Parse the integer verbosity level from the command line args into a logging_level string</span>
 
@@ -196,7 +231,7 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging_level</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">logger</span>
 
- </div>
+</div>
 <div class="viewcode-block" id="check_config"><a class="viewcode-back" href="../../corr2.html#treecorr.config.check_config">[docs]</a><span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check (and update) a config dict to conform to the given parameter rules.</span>
 <span class="sd">    The params dict has an entry for each valid config parameter whose value is a tuple</span>
@@ -236,10 +271,16 @@
         <span class="n">value_type</span><span class="p">,</span> <span class="n">may_be_list</span><span class="p">,</span> <span class="n">default_value</span><span class="p">,</span> <span class="n">valid_values</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">][:</span><span class="mi">4</span><span class="p">]</span>
 
         <span class="c"># Get the value</span>
-        <span class="k">if</span> <span class="n">value_type</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">may_be_list</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value_type</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[</span> <span class="n">value_type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">value_type</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">value_type</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value_type</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
         <span class="c"># If limited allowed values, check that this is one of them.</span>
         <span class="k">if</span> <span class="n">valid_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -298,10 +339,10 @@
 </div>
 <div class="viewcode-block" id="convert"><a class="viewcode-back" href="../../corr2.html#treecorr.config.convert">[docs]</a><span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert the given value to the given type.</span>
-<span class="sd">    </span>
+
 <span class="sd">    The key helps determine what kind of conversion should be performed.</span>
 <span class="sd">    Specifically if &#39;unit&#39; is in the key value, then a unit conversion is done.</span>
-<span class="sd">    Otherwise, it just parses </span>
+<span class="sd">    Otherwise, it just parses</span>
 
 <span class="sd">    :param value:       The input value to be converted.  Usually a string.</span>
 <span class="sd">    :param value_type:  The type to convert to.</span>
@@ -319,8 +360,8 @@
 <div class="viewcode-block" id="get_from_list"><a class="viewcode-back" href="../../corr2.html#treecorr.config.get_from_list">[docs]</a><span class="k">def</span> <span class="nf">get_from_list</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A helper function to get a key from config that is allowed to be a list</span>
 
-<span class="sd">    Some of the config values are allowed to be lists of values, in which case we take the </span>
-<span class="sd">    `num` item from the list.  If they are not a list, then the given value is used for </span>
+<span class="sd">    Some of the config values are allowed to be lists of values, in which case we take the</span>
+<span class="sd">    `num` item from the list.  If they are not a list, then the given value is used for</span>
 <span class="sd">    all values of `num`.</span>
 
 <span class="sd">    :param config:      The configuration dict from which to get the key value.</span>
@@ -386,20 +427,13 @@
     <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">future</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">valid_params</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="n">check_config</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">valid_params</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">kwargs</span>
 
 </div>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">ctypes</span>
-<span class="n">_treecorr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ctypeslib</span><span class="o">.</span><span class="n">load_library</span><span class="p">(</span><span class="s">&#39;_treecorr&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
-<span class="n">_treecorr</span><span class="o">.</span><span class="n">SetOMPThreads</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span>
-<span class="n">_treecorr</span><span class="o">.</span><span class="n">SetOMPThreads</span><span class="o">.</span><span class="n">argtypes</span> <span class="o">=</span> <span class="p">[</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span> <span class="p">]</span>
-
 <div class="viewcode-block" id="set_omp_threads"><a class="viewcode-back" href="../../corr2.html#treecorr.config.set_omp_threads">[docs]</a><span class="k">def</span> <span class="nf">set_omp_threads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set the number of OpenMP threads to use in the C++ layer.</span>
 
@@ -411,22 +445,28 @@
 <span class="sd">                        the requested number of threads.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">input_num_threads</span> <span class="o">=</span> <span class="n">num_threads</span>  <span class="c"># Save the input value.</span>
+
+    <span class="c"># If num_threads is auto, get it from cpu_count</span>
     <span class="k">if</span> <span class="n">num_threads</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">num_threads</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">multiprocessing</span>
         <span class="n">num_threads</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;multiprocessing.cpu_count() = </span><span class="si">%d</span><span class="s">&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">num_threads</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Telling OpenMP to use </span><span class="si">%d</span><span class="s"> threads&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
-        <span class="n">num_threads</span> <span class="o">=</span> <span class="n">_treecorr</span><span class="o">.</span><span class="n">SetOMPThreads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;OpenMP reports that it will use </span><span class="si">%d</span><span class="s"> threads&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">num_threads</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Using </span><span class="si">%d</span><span class="s"> threads.&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">input_num_threads</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">input_num_threads</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="c"># Only warn if the user specifically asked for num_threads != 1.</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Unable to use multiple threads, since OpenMP is not enabled.&#39;</span><span class="p">)</span>
+
+    <span class="c"># Tell OpenMP to use this many threads</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Telling OpenMP to use </span><span class="si">%d</span><span class="s"> threads&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
+    <span class="n">num_threads</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">_lib</span><span class="o">.</span><span class="n">SetOMPThreads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span>
+
+    <span class="c"># Report back appropriately.</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;OpenMP reports that it will use </span><span class="si">%d</span><span class="s"> threads&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_threads</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Using </span><span class="si">%d</span><span class="s"> threads.&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">input_num_threads</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">input_num_threads</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c"># Only warn if the user specifically asked for num_threads != 1.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;Unable to use multiple threads, since OpenMP is not enabled.&#39;</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">num_threads</span>
 </pre></div></div>
 

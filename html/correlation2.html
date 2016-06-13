@@ -26,7 +26,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="TreeCorr  documentation" href="index.html" />
     <link rel="next" title="NN: Count-count correlations" href="nn.html" />
-    <link rel="prev" title="Fields" href="field.html" /> 
+    <link rel="prev" title="Metrics" href="metric.html" /> 
   </head>
   <body>
     <div class="related">
@@ -42,7 +42,7 @@
           <a href="nn.html" title="NN: Count-count correlations"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="field.html" title="Fields"
+          <a href="metric.html" title="Metrics"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">TreeCorr  documentation</a> &raquo;</li> 
       </ul>
@@ -132,8 +132,10 @@ is not given, then max_sep will be adjusted as needed to allow nbins to be
 an integer value.)</li>
 <li><strong>sep_units</strong> &#8211; The units to use for the separation values, given as a string.  This 
 includes both min_sep and max_sep above, as well as the units of the 
-output R column.  Valid options are arcsec, arcmin, degrees, hours,
-radians.  (default: radians)</li>
+output distance values.  Valid options are arcsec, arcmin, degrees, hours,
+radians.  (default: radians if angular units make sense, but for 3-d
+or flat 2-d positions, the default will just match the units of x,y[,z]
+coordinates)</li>
 <li><strong>bin_slop</strong> &#8211; How much slop to allow in the placement of pairs in the bins.
 If bin_slop = 1, then the bin into which a particular pair is placed may
 be incorrect by at most 1.0 bin widths.  (default: None, which means to
@@ -161,6 +163,8 @@ Options are:</p>
 <li>median = Use the median of the coordinate being split.</li>
 <li>middle = Use the middle of the range; i.e. the average of the minimum and
 maximum value.</li>
+<li>random: Use a random point somewhere in the middle two quartiles of the
+range.</li>
 </ul>
 </li>
 <li><strong>max_top</strong> &#8211; The maximum number of top layers to use when setting up the field. 
@@ -183,9 +187,17 @@ distance between points on the unit sphere.</li>
 with distance from Earth <cite>r1, r2</cite>, if <cite>d</cite> is the normal Euclidean 
 distance and <span class="math">\(Rparallel = |r1-r2|\)</span>, then we define
 <span class="math">\(Rperp^2 = d^2 - Rparallel^2\)</span>.</li>
+<li>&#8216;Rlens&#8217; = the projected distance perpendicular to the first point
+in the pair (taken to be a lens) to the line of sight to the second
+point (e.g. a lensed source galaxy).</li>
+<li>&#8216;Arc&#8217; = the true great circle distance for spherical coordinates.</li>
 </ul>
 <p>(default: &#8216;Euclidean&#8217;)</p>
 </li>
+<li><strong>min_rpar</strong> &#8211; For the &#8216;Rperp&#8217; metric, the minimum difference in Rparallel to allow
+for pairs being included in the correlation function. (default: None)</li>
+<li><strong>max_rpar</strong> &#8211; For the &#8216;Rperp&#8217; metric, the maximum difference in Rparallel to allow
+for pairs being included in the correlation function. (default: None)</li>
 <li><strong>num_threads</strong> &#8211; How many OpenMP threads to use during the calculation.  
 (default: use the number of cpu cores; this value can also be given in
 the constructor in the config dict.) Note that this won&#8217;t work if the 
@@ -215,8 +227,8 @@ system&#8217;s C compiler is clang prior to version 3.7.</li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="field.html"
-                        title="previous chapter">Fields</a></p>
+  <p class="topless"><a href="metric.html"
+                        title="previous chapter">Metrics</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="nn.html"
                         title="next chapter">NN: Count-count correlations</a></p>
@@ -255,7 +267,7 @@ system&#8217;s C compiler is clang prior to version 3.7.</li>
           <a href="nn.html" title="NN: Count-count correlations"
              >next</a> |</li>
         <li class="right" >
-          <a href="field.html" title="Fields"
+          <a href="metric.html" title="Metrics"
              >previous</a> |</li>
         <li><a href="index.html">TreeCorr  documentation</a> &raquo;</li> 
       </ul>

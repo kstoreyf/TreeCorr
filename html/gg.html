@@ -88,34 +88,40 @@ function.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">logr:</th><td class="field-body">The nominal center of the bin in log(r) (the natural logarithm of r).</td>
 </tr>
-<tr class="field-even field"><th class="field-name">meanr:</th><td class="field-body">The (weighted) mean value of r for the pairs in each bin.
+<tr class="field-even field"><th class="field-name">rnom:</th><td class="field-body">The nominal center of the bin converted to regular distance. 
+i.e. r = exp(logr).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">meanr:</th><td class="field-body">The (weighted) mean value of r for the pairs in each bin.
 If there are no pairs in a bin, then exp(logr) will be used instead.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">meanlogr:</th><td class="field-body">The (weighted) mean value of log(r) for the pairs in each bin.
+<tr class="field-even field"><th class="field-name">meanlogr:</th><td class="field-body">The (weighted) mean value of log(r) for the pairs in each bin.
 If there are no pairs in a bin, then logr will be used instead.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">xip:</th><td class="field-body">The correlation function, <span class="math">\(\xi_+(r)\)</span>.</td>
+<tr class="field-odd field"><th class="field-name">xip:</th><td class="field-body">The correlation function, <span class="math">\(\xi_+(r)\)</span>.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">xim:</th><td class="field-body">The correlation funciton, <span class="math">\(\xi_-(r)\)</span>.</td>
+<tr class="field-even field"><th class="field-name">xim:</th><td class="field-body">The correlation funciton, <span class="math">\(\xi_-(r)\)</span>.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">xip_im:</th><td class="field-body">The imaginary part of <span class="math">\(\xi_+(r)\)</span>.</td>
+<tr class="field-odd field"><th class="field-name">xip_im:</th><td class="field-body">The imaginary part of <span class="math">\(\xi_+(r)\)</span>.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">xim_im:</th><td class="field-body">The imaginary part of <span class="math">\(\xi_-(r)\)</span>.</td>
+<tr class="field-even field"><th class="field-name">xim_im:</th><td class="field-body">The imaginary part of <span class="math">\(\xi_-(r)\)</span>.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">varxi:</th><td class="field-body">The variance of xip and xim, only including the shape noise propagated
+<tr class="field-odd field"><th class="field-name">varxi:</th><td class="field-body">The variance of xip and xim, only including the shape noise propagated
 into the final correlation.  This does not include sample variance, so
 it is always an underestimate of the actual variance.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">weight:</th><td class="field-body">The total weight in each bin.</td>
+<tr class="field-even field"><th class="field-name">weight:</th><td class="field-body">The total weight in each bin.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">npairs:</th><td class="field-body">The number of pairs going into each bin.</td>
+<tr class="field-odd field"><th class="field-name">npairs:</th><td class="field-body">The number of pairs going into each bin.</td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
-<p>If sep_units are given (either in the config dict or as a named kwarg) then logr and meanlogr
-both take r to be in these units.  i.e. exp(logr) will have R in units of sep_units.</p>
-<p>The usage pattern is as follows:</p>
+<p>If <cite>sep_units</cite> are given (either in the config dict or as a named kwarg) then the distances
+will all be in these units.  Note however, that if you separate out the steps of the 
+<tt class="xref py py-func docutils literal"><span class="pre">process()</span></tt> command and use <tt class="xref py py-func docutils literal"><span class="pre">process_auto()</span></tt> and/or <tt class="xref py py-func docutils literal"><span class="pre">process_cross()</span></tt>, then the
+units will not be applied to :meanr: or :meanlogr: until the <tt class="xref py py-func docutils literal"><span class="pre">finalize()</span></tt> function is
+called.</p>
+<p>The typical usage pattern is as follows:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">gg</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">GGCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gg</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat</span><span class="p">)</span>         <span class="c"># For auto-correlation.</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gg</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">)</span>   <span class="c"># For cross-correlation.</span>
@@ -268,6 +274,10 @@ distance between points on the unit sphere.</li>
 with distance from Earth <cite>r1, r2</cite>, if <cite>d</cite> is the normal Euclidean 
 distance and <span class="math">\(Rparallel = |r1-r2|\)</span>, then we define
 <span class="math">\(Rperp^2 = d^2 - Rparallel^2\)</span>.</li>
+<li>&#8216;Rlens&#8217; = the projected distance perpendicular to the first point
+in the pair (taken to be a lens) to the line of sight to the second
+point (e.g. a lensed source galaxy).</li>
+<li>&#8216;Arc&#8217; = the true great circle distance for spherical coordinates.</li>
 </ul>
 <p>(default: &#8216;Euclidean&#8217;; this value can also be given in the constructor
 in the config dict.)</p>
@@ -428,6 +438,9 @@ bin.</td>
 </tbody>
 </table>
 </div></blockquote>
+<p>If <cite>sep_units</cite> was given at construction, then the distances will all be in these units.
+Otherwise, they will be in either the same units as x,y,z (for flat or 3d coordinates) or
+radians (for spherical coordinates).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
