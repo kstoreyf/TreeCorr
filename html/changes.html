@@ -161,6 +161,17 @@ were not being installed into the right place.</li>
 statistic.</li>
 </ul>
 </div>
+<div class="section" id="version-3-3-5-bug-fixes">
+<h2>Version 3.3.5 bug fixes:<a class="headerlink" href="#version-3-3-5-bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added an exception if sep_units is used with either Rperp or Rlens.  This
+would really be a user error, not a TreeCorr bug, but it was not obvious
+that this was invalid, so raising the exception should help users notice
+the error.</li>
+<li>Added a timeout for the ffi question in setup.py to avoid pip installation
+hanging. (#45)</li>
+</ul>
+</div>
 </div>
 
 
@@ -180,6 +191,7 @@ statistic.</li>
 <li><a class="reference internal" href="#version-3-3-2-bug-fix">Version 3.3.2 bug fix:</a></li>
 <li><a class="reference internal" href="#version-3-3-3-bug-fix">Version 3.3.3 bug fix:</a></li>
 <li><a class="reference internal" href="#version-3-3-4-bug-fix">Version 3.3.4 bug fix:</a></li>
+<li><a class="reference internal" href="#version-3-3-5-bug-fixes">Version 3.3.5 bug fixes:</a></li>
 </ul>
 </li>
 </ul>
