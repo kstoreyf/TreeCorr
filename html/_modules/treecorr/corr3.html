@@ -208,7 +208,7 @@
 
     <span class="c"># Do GGG correlation function if necessary</span>
     <span class="k">if</span> <span class="s">&#39;ggg_file_name&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span> <span class="c">#or &#39;m3_file_name&#39; in config:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Start GGG calculations...&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing GGG calculations...&quot;</span><span class="p">)</span>
         <span class="n">ggg</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">GGGCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
         <span class="n">ggg</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done GGG calculations.&quot;</span><span class="p">)</span>
@@ -229,12 +229,13 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s">&quot;Cannot yet handle 3-point corrleations with only two catalogs. &quot;</span><span class="o">+</span>
                 <span class="s">&quot;Need both cat2 and cat3.&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Start DDD calculations...&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing DDD calculations...&quot;</span><span class="p">)</span>
         <span class="n">ddd</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
         <span class="n">ddd</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done DDD calculations.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing RRR calculations...&quot;</span><span class="p">)</span>
             <span class="n">rrr</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">rrr</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">rand1</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done RRR calculations.&quot;</span><span class="p">)</span>
@@ -243,26 +244,33 @@
             <span class="n">cat2</span> <span class="o">=</span> <span class="n">cat3</span> <span class="o">=</span> <span class="n">cat1</span>
             <span class="n">rand2</span> <span class="o">=</span> <span class="n">rand3</span> <span class="o">=</span> <span class="n">rand1</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing RRR calculations...&quot;</span><span class="p">)</span>
             <span class="n">rrr</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">rrr</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">rand1</span><span class="p">,</span><span class="n">rand2</span><span class="p">,</span><span class="n">rand3</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done RRR calculations.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;nnn_statistic&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;compensated&#39;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing DRR calculations...&quot;</span><span class="p">)</span>
             <span class="n">drr</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">drr</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">rand2</span><span class="p">,</span><span class="n">rand3</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done DRR calculations.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing DDR calculations...&quot;</span><span class="p">)</span>
             <span class="n">ddr</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">ddr</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">rand3</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done DDR calculations.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing RDR calculations...&quot;</span><span class="p">)</span>
             <span class="n">rdr</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">rdr</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">rand1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">rand3</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done RDR calculations.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing RRD calculations...&quot;</span><span class="p">)</span>
             <span class="n">rrd</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">rrd</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">rand1</span><span class="p">,</span><span class="n">rand2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done RRD calculations.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing DRD calculations...&quot;</span><span class="p">)</span>
             <span class="n">drd</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">drd</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">rand2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done DRD calculations.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing RDD calculations...&quot;</span><span class="p">)</span>
             <span class="n">rdd</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNNCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
             <span class="n">rdd</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">rand1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done RDD calculations.&quot;</span><span class="p">)</span>
@@ -272,7 +280,7 @@
 
     <span class="c"># Do KKK correlation function if necessary</span>
     <span class="k">if</span> <span class="s">&#39;kkk_file_name&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Start KKK calculations...&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing KKK calculations...&quot;</span><span class="p">)</span>
         <span class="n">kkk</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">KKKCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
         <span class="n">kkk</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done KKK calculations.&quot;</span><span class="p">)</span>
@@ -283,7 +291,7 @@
     <span class="c">#if &#39;nng_file_name&#39; in config or &#39;nnm_file_name&#39; in config:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;file_name3 is required for nng correlation&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Start NNG calculations...&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing NNG calculations...&quot;</span><span class="p">)</span>
         <span class="n">nng</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNGCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
         <span class="n">nng</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done NNG calculation.&quot;</span><span class="p">)</span>
@@ -309,7 +317,7 @@
     <span class="c">#if &#39;nnk_file_name&#39; in config:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;file_name3 is required for nnk correlation&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Start NNK calculations...&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing NNK calculations...&quot;</span><span class="p">)</span>
         <span class="n">nnk</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">NNKCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
         <span class="n">nnk</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done NNK calculation.&quot;</span><span class="p">)</span>
@@ -330,7 +338,7 @@
     <span class="c">#if &#39;kkg_file_name&#39; in config:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;file_name3 is required for kkg correlation&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Start KKG calculations...&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Performing KKG calculations...&quot;</span><span class="p">)</span>
         <span class="n">kkg</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">KKGCorrelation</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="n">logger</span><span class="p">)</span>
         <span class="n">kkg</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">cat1</span><span class="p">,</span><span class="n">cat2</span><span class="p">,</span><span class="n">cat3</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done KKG calculation.&quot;</span><span class="p">)</span>
