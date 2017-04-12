@@ -86,10 +86,14 @@ but with the same scaling with N and b.</li>
 range of triangle geometries you are calculating.  They are significantly
 slower than the 2-point functions, but many orders of magnitude faster than
 brute force algorithms.</li>
-<li>Reference: Jarvis, Bernstein, &amp; Jain, 2004, MNRAS, 352, 338
+<li><strong>If you use TreeCorr in published research, please reference:
+Jarvis, Bernstein, &amp; Jain, 2004, MNRAS, 352, 338</strong>
 (I&#8217;m working on new paper about TreeCorr, including some of the improvements
 I&#8217;ve made since then, but this will suffice as a reference for now.)</li>
 <li>Record on the Astrophyics Source Code Library: <a class="reference external" href="http://ascl.net/1508.007">http://ascl.net/1508.007</a></li>
+<li>Developed by Mike Jarvis.  Fee free to contact me with questions or comments
+at mikejarvis17 at gmail.  Or post an issue (see below) if you have any
+problems with the code.</li>
 </ul>
 <p>The code is licensed under a FreeBSD license.  Essentially, you can use the
 code in any way you want, but if you distribute it, you need to include the
@@ -126,31 +130,83 @@ that is also relatively straightforward:</p>
 <li><p class="first">Dependencies: All dependencies should be installed automatically for you by
 setup.py, so you should not need to worry about these.  But if you are
 interested, the dependencies are:</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li>numpy</li>
 <li>future</li>
-<li>fitsio: TreeCorr can use either fitsio or pyfits (now part of astropy),
-so it will only install fitsio if none of these are present on your
-system.</li>
-<li>pandas: This package significantly speeds up the reading of ASCII
-input catalogs over the numpy functions loadtxt or genfromtxt.
-However, if you don&#8217;t have pandas installed, TreeCorr will fall back
-to using the slower numpy.genfromtxt.</li>
+<li>fitsio</li>
+<li>pandas</li>
+<li>pyyaml</li>
+<li>cffi</li>
 </ul>
-</div></blockquote>
+<p>The last dependency is the only one that typically could cause any problems, since it in
+turn depends on a library called libffi.  This is a common thing to have installed already
+on linux machines, so it is likely that you won&#8217;t have any trouble with it, but if you get
+errors about &#8220;ffi.h&#8221; not being found, then you may need to either install it yourself or
+update your paths to include the directory where ffi.h is found.</p>
+<ol class="loweralpha">
+<li><p class="first">Installing libffi on linux systems:</p>
+<p>If you have root access on your system, then one of the following should work to install
+libffi:</p>
+<div class="highlight-python"><div class="highlight"><pre>apt-get install libffi-dev
+yum install libffi-devel
+</pre></div>
+</div>
+</li>
+<li><p class="first">Installing libffi on Mac systems:</p>
+<p>It should be installed as part of the XCode libraries after running:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">xcode</span><span class="o">-</span><span class="n">select</span> <span class="o">--</span><span class="n">install</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Installing libffi manually:</p>
+<p>If neither of the above methods works for you, you can install it yourself with the
+following commands:</p>
+<div class="highlight-python"><div class="highlight"><pre>wget ftp://sourceware.org:/pub/libffi/libffi-3.2.1.tar.gz
+tar xfz libffi-3.2.1.tar.gz
+cd libffi-3.2.1
+./configure --prefix={prefix}
+make
+make install
+cp */include/ffi*.h {prefix}/include
+cd ..
+</pre></div>
+</div>
+<p>where {prefix} is wherever you want the code to be installed.  e.g. /home/username.</p>
+</li>
+<li><p class="first">Updating your system paths:</p>
+<p>If you used option (c) above and <tt class="docutils literal"><span class="pre">{prefix}</span></tt> is not <tt class="docutils literal"><span class="pre">/usr/local</span></tt> or similar, then you
+might need to update some system paths to let the compiler know where to look for the header
+file and library.  Similarly, if libffi was already installed, but it is in a non-standard
+location where gcc doesn&#8217;t look by default, then this also applies.  (Try <tt class="docutils literal"><span class="pre">locate</span> <span class="pre">ffi.h</span></tt>
+to see if it shows up somewhere.)</p>
+<p>Assuming <tt class="docutils literal"><span class="pre">ffi.h</span></tt> is in <tt class="docutils literal"><span class="pre">{prefix}/include/ffi/</span></tt> and <tt class="docutils literal"><span class="pre">libffi.so</span></tt> (or <tt class="docutils literal"><span class="pre">libffi.dylib</span></tt> on
+Macs) is in <tt class="docutils literal"><span class="pre">{prefix}/lib/</span></tt>, then the following commands should be put in your <tt class="docutils literal"><span class="pre">.bashrc</span></tt>
+or <tt class="docutils literal"><span class="pre">.bash_profile</span></tt> file:</p>
+<div class="highlight-python"><div class="highlight"><pre>export C_INCLUDE_PATH=$C_INCLUDE_PATH:{prefix}/include
+export LIBRARY_PATH=$LIBRARY_PATH:{prefix}/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{prefix}/lib
+</pre></div>
+</div>
+<p>Or if you use C shell, put the following in <tt class="docutils literal"><span class="pre">.cshrc</span></tt> or equivalent file:</p>
+<div class="highlight-python"><div class="highlight"><pre>setenv C_INCLUDE_PATH &quot;$C_INCLUDE_PATH&quot;:{prefix}/include
+setenv LIBRARY_PATH &quot;$LIBRARY_PATH&quot;:{prefix}/lib
+setenv LD_LIBRARY_PATH &quot;$LD_LIBRARY_PATH&quot;:{prefix}/lib
+</pre></div>
+</div>
+</li>
+</ol>
 </li>
 <li><p class="first">Download the zip file or tarball for the latest release from:</p>
 <p><a class="reference external" href="https://github.com/rmjarvis/TreeCorr/releases/">https://github.com/rmjarvis/TreeCorr/releases/</a></p>
 </li>
 <li><p class="first">Unzip the archive with either of the following (depending on which kind
 of archive you downloaded):</p>
-<div class="highlight-python"><div class="highlight"><pre>unzip TreeCorr-3.3.6.zip
-tar xvzf TreeCorr-3.3.6.tar.gz
+<div class="highlight-python"><div class="highlight"><pre>unzip TreeCorr-3.3.7.zip
+tar xvzf TreeCorr-3.3.7.tar.gz
 </pre></div>
 </div>
-<p>It will unzip into the directory TreeCorr-3.3.6. Change to that directory:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd TreeCorr-3.3.6
+<p>It will unzip into the directory TreeCorr-3.3.7. Change to that directory:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd TreeCorr-3.3.7
 </pre></div>
 </div>
 </li>
@@ -267,8 +323,9 @@ files.</p>
 </div>
 <div class="section" id="using-the-python-module">
 <h2>Using the Python module<a class="headerlink" href="#using-the-python-module" title="Permalink to this headline">¶</a></h2>
-<p>Here we only give a quick overview.  Full Sphinx-generated documentation can
-be found at:</p>
+<p>Here we only give a quick overview.  A Jupyter notebook tutorial here:</p>
+<p><a class="reference external" href="https://github.com/rmjarvis/TreeCorr/blob/master/tests/Tutorial.ipynb">https://github.com/rmjarvis/TreeCorr/blob/master/tests/Tutorial.ipynb</a></p>
+<p>goes into more detail.  And full Sphinx-generated documentation can be found at:</p>
 <p><a class="reference external" href="http://rmjarvis.github.io/TreeCorr/html/index.html">http://rmjarvis.github.io/TreeCorr/html/index.html</a></p>
 <p>The TreeCorr module is called <tt class="docutils literal"><span class="pre">treecorr</span></tt> in Python.  Typical usage for
 computing the shear-shear correlation function looks something like the

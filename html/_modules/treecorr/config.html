@@ -309,7 +309,7 @@
     <span class="k">return</span> <span class="n">config</span>
 
 </div>
-<div class="viewcode-block" id="print_params"><a class="viewcode-back" href="../../corr2.html#treecorr.config.print_params">[docs]</a><span class="k">def</span> <span class="nf">print_params</span><span class="p">(</span><span class="n">params</span><span class="p">):</span> <span class="c"># pragma: no cover</span>
+<div class="viewcode-block" id="print_params"><a class="viewcode-back" href="../../corr2.html#treecorr.config.print_params">[docs]</a><span class="k">def</span> <span class="nf">print_params</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Print the information about the valid parameters, given by the given params dict.</span>
 <span class="sd">    See check_config for the structure of the params dict.</span>
 
@@ -459,7 +459,7 @@
     <span class="n">num_threads</span> <span class="o">=</span> <span class="n">treecorr</span><span class="o">.</span><span class="n">_lib</span><span class="o">.</span><span class="n">SetOMPThreads</span><span class="p">(</span><span class="n">num_threads</span><span class="p">)</span>
 
     <span class="c"># Report back appropriately.</span>
-    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span> <span class="c"># pragma: no cover</span>
+    <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;OpenMP reports that it will use </span><span class="si">%d</span><span class="s"> threads&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">num_threads</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Using </span><span class="si">%d</span><span class="s"> threads.&#39;</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span>
