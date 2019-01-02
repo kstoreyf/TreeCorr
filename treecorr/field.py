@@ -44,6 +44,8 @@ class NField(object):
     """
     def __init__(self, cat, min_size, max_size, split_method='mean', max_top=10, logger=None):
         from treecorr.util import double_ptr as dp
+        from treecorr.util import long_ptr as lp
+
         if logger:
             if cat.name != '':
                 logger.info('Building NField from cat %s',cat.name)
@@ -58,7 +60,7 @@ class NField(object):
         if cat.coords == 'flat':
             self.flat = True
             self.data = treecorr._lib.BuildNFieldFlat(dp(cat.x),dp(cat.y),
-                                                      dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                      dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                       min_size,max_size,sm,max_top)
             if logger:
                 logger.debug('Finished building NField 2D')
@@ -66,14 +68,14 @@ class NField(object):
             self.flat = False
             if cat.coords == 'spherical':
                 self.data = treecorr._lib.BuildNFieldSphere(dp(cat.x),dp(cat.y),dp(cat.z),
-                                                            dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                            dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                             min_size,max_size,sm,max_top)
                 self.spher = True
                 if logger:
                     logger.debug('Finished building NField Sphere')
             else:
                 self.data = treecorr._lib.BuildNField3D(dp(cat.x),dp(cat.y),dp(cat.z),
-                                                        dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                        dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                         min_size,max_size,sm,max_top)
                 self.spher = False
                 if logger:
@@ -121,6 +123,8 @@ class KField(object):
     """
     def __init__(self, cat, min_size, max_size, split_method='mean', max_top=10, logger=None):
         from treecorr.util import double_ptr as dp
+        from treecorr.util import long_ptr as lp
+
         if logger:
             if cat.name != '':
                 logger.info('Building KField from cat %s',cat.name)
@@ -136,7 +140,7 @@ class KField(object):
             self.flat = True
             self.data = treecorr._lib.BuildKFieldFlat(dp(cat.x),dp(cat.y),
                                                       dp(cat.k),
-                                                      dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                      dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                       min_size,max_size,sm,max_top)
             if logger:
                 logger.debug('Finished building KField Flat')
@@ -145,7 +149,7 @@ class KField(object):
             if cat.coords == 'spherical':
                 self.data = treecorr._lib.BuildKFieldSphere(dp(cat.x),dp(cat.y),dp(cat.z),
                                                             dp(cat.k),
-                                                            dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                            dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                             min_size,max_size,sm,max_top)
                 self.spher = True
                 if logger:
@@ -153,7 +157,7 @@ class KField(object):
             else:
                 self.data = treecorr._lib.BuildKField3D(dp(cat.x),dp(cat.y),dp(cat.z),
                                                         dp(cat.k),
-                                                        dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                        dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                         min_size,max_size,sm,max_top)
                 self.spher = False
                 if logger:
@@ -203,6 +207,7 @@ class GField(object):
     """
     def __init__(self, cat, min_size, max_size, split_method='mean', max_top=10, logger=None):
         from treecorr.util import double_ptr as dp
+        from treecorr.util import long_ptr as lp
         if logger:
             if cat.name != '':
                 logger.info('Building GField from cat %s',cat.name)
@@ -218,7 +223,7 @@ class GField(object):
             self.flat = True
             self.data = treecorr._lib.BuildGFieldFlat(dp(cat.x),dp(cat.y),
                                                       dp(cat.g1),dp(cat.g2),
-                                                      dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                      dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                       min_size,max_size,sm,max_top)
             if logger:
                 logger.debug('Finished building GField Flat')
@@ -227,7 +232,7 @@ class GField(object):
             if cat.coords == 'spherical':
                 self.data = treecorr._lib.BuildGFieldSphere(dp(cat.x),dp(cat.y),dp(cat.z),
                                                             dp(cat.g1),dp(cat.g2),
-                                                            dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                            dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                             min_size,max_size,sm,max_top)
                 self.spher = True
                 if logger:
@@ -235,7 +240,7 @@ class GField(object):
             else:
                 self.data = treecorr._lib.BuildGField3D(dp(cat.x),dp(cat.y),dp(cat.z),
                                                         dp(cat.g1),dp(cat.g2),
-                                                        dp(cat.w),dp(cat.wpos),cat.ntot,
+                                                        dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot,
                                                         min_size,max_size,sm,max_top)
                 self.spher = False
                 if logger:
@@ -277,6 +282,8 @@ class NSimpleField(object):
     """
     def __init__(self, cat, logger=None):
         from treecorr.util import double_ptr as dp
+        from treecorr.util import long_ptr as lp
+
         if logger:
             if cat.name != '':
                 logger.info('Building NSimpleField from cat %s',cat.name)
@@ -286,20 +293,20 @@ class NSimpleField(object):
         if cat.coords == 'flat':
             self.flat = True
             self.data = treecorr._lib.BuildNSimpleFieldFlat(dp(cat.x),dp(cat.y),
-                                                            dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                            dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
             if logger:
                 logger.debug('Finished building NSimpleField Flat')
         else:
             self.flat = False
             if cat.coords == 'spherical':
                 self.data = treecorr._lib.BuildNSimpleFieldSphere(dp(cat.x),dp(cat.y),dp(cat.z),
-                                                                  dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                                  dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
                 self.spher = True
                 if logger:
                     logger.debug('Finished building NSimpleField Sphere')
             else:
                 self.data = treecorr._lib.BuildNSimpleField3D(dp(cat.x),dp(cat.y),dp(cat.z),
-                                                              dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                              dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
                 self.spher = False
                 if logger:
                     logger.debug('Finished building NSimpleField 3D')
@@ -329,6 +336,8 @@ class KSimpleField(object):
     """
     def __init__(self, cat, logger=None):
         from treecorr.util import double_ptr as dp
+        from treecorr.util import long_ptr as lp
+
         if logger:
             if cat.name != '':
                 logger.info('Building KSimpleField from cat %s',cat.name)
@@ -339,7 +348,7 @@ class KSimpleField(object):
             self.flat = True
             self.data = treecorr._lib.BuildKSimpleFieldFlat(dp(cat.x),dp(cat.y),
                                                             dp(cat.k),
-                                                            dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                            dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
             if logger:
                 logger.debug('Finished building KSimpleField Flat')
         else:
@@ -347,14 +356,14 @@ class KSimpleField(object):
             if cat.coords == 'spherical':
                 self.data = treecorr._lib.BuildKSimpleFieldSphere(dp(cat.x),dp(cat.y),dp(cat.z),
                                                                   dp(cat.k),
-                                                                  dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                                  dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
                 self.spher = True
                 if logger:
                     logger.debug('Finished building KSimpleField Sphere')
             else:
                 self.data = treecorr._lib.BuildKSimpleField3D(dp(cat.x),dp(cat.y),dp(cat.z),
                                                               dp(cat.k),
-                                                              dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                              dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
                 self.spher = False
                 if logger:
                     logger.debug('Finished building KSimpleField 3D')
@@ -384,6 +393,7 @@ class GSimpleField(object):
     """
     def __init__(self, cat, logger=None):
         from treecorr.util import double_ptr as dp
+        from treecorr.util import long_ptr as lp
         if logger:
             if cat.name != '':
                 logger.info('Building GSimpleField from cat %s',cat.name)
@@ -394,7 +404,7 @@ class GSimpleField(object):
             self.flat = True
             self.data = treecorr._lib.BuildGSimpleFieldFlat(dp(cat.x),dp(cat.y),
                                                             dp(cat.g1),dp(cat.g2),
-                                                            dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                            dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
             if logger:
                 logger.debug('Finished building GSimpleField Flat')
         else:
@@ -402,14 +412,14 @@ class GSimpleField(object):
             if cat.coords == 'spherical':
                 self.data = treecorr._lib.BuildGSimpleFieldSphere(dp(cat.x),dp(cat.y),dp(cat.z),
                                                                   dp(cat.g1),dp(cat.g2),
-                                                                  dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                                  dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
                 self.spher = True
                 if logger:
                     logger.debug('Finished building GSimpleField Sphere')
             else:
                 self.data = treecorr._lib.BuildGSimpleField3D(dp(cat.x),dp(cat.y),dp(cat.z),
                                                               dp(cat.g1),dp(cat.g2),
-                                                              dp(cat.w),dp(cat.wpos),cat.ntot)
+                                                              dp(cat.w),dp(cat.wpos),lp(cat.idx),cat.ntot)
                 self.spher = False
                 if logger:
                     logger.debug('Finished building GSimpleField 3D')

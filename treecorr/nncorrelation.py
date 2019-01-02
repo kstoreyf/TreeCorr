@@ -17,7 +17,7 @@
 
 import treecorr
 import numpy
-
+import gc
 
 class NNCorrelation(treecorr.BinnedCorr2):
     """This class handles the calculation and storage of a 2-point count-count correlation
@@ -77,16 +77,20 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.meanlogr = numpy.zeros(self.nbins, dtype=float)
         self.weight = numpy.zeros(self.nbins, dtype=float)
         self.npairs = numpy.zeros(self.nbins, dtype=float)
+        self.idxpairs = numpy.full(self.res_size, -1, dtype=long)
+
         self.tot = 0.
         self._build_corr()
         self.logger.debug('Finished building NNCorr')
 
     def _build_corr(self):
         from treecorr.util import double_ptr as dp
+        from treecorr.util import long_ptr as lp
         self.corr = treecorr._lib.BuildNNCorr(
                 self._min_sep,self._max_sep,self.nbins,self.bin_size,self.b,
                 self.min_rpar, self.max_rpar,
-                dp(self.meanr),dp(self.meanlogr),dp(self.weight),dp(self.npairs));
+                dp(self.meanr),dp(self.meanlogr),dp(self.weight),dp(self.npairs),
+                lp(self.idxpairs));
 
     def __del__(self):
         # Using memory allocated from the C layer means we have to explicitly deallocate it
@@ -123,7 +127,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
 
         :param cat:         The catalog to process
         :param metric:      Which metric to use.  See :meth:`~treecorr.NNCorrelation.process` for 
-                            details.  (default: 'Euclidean'; this value can also be given in the 
+                            details.  (default: 'Euclidean'; this value can also be given in the
                             constructor in the config dict.)
         :param num_threads: How many OpenMP threads to use during the calculation.  
                             (default: use the number of cpu cores; this value can also be given in
@@ -140,12 +144,11 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self._set_num_threads(num_threads)
 
         min_size, max_size = self._get_minmax_size()
-
         field = cat.getNField(min_size,max_size,self.split_method,self.max_top)
-
         self.logger.info('Starting %d jobs.',field.nTopLevelNodes)
         treecorr._lib.ProcessAutoNN(self.corr, field.data, self.output_dots,
                                     self._coords, self._metric)
+        self.idxpairs = self.idxpairs[:int(numpy.sum(self.npairs))]
         self.tot += 0.5 * cat.sumw**2
 
 
@@ -184,6 +187,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.logger.info('Starting %d jobs.',f1.nTopLevelNodes)
         treecorr._lib.ProcessCrossNN(self.corr, f1.data, f2.data, self.output_dots,
                                      self._coords, self._metric)
+        self.idxpairs = self.idxpairs[:int(numpy.sum(self.npairs))]
         self.tot += cat1.sumw*cat2.sumw
 
 
@@ -220,6 +224,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
 
         treecorr._lib.ProcessPairNN(self.corr, f1.data, f2.data, self.output_dots,
                                     self._coords, self._metric)
+        self.idxpairs = self.idxpairs[:int(numpy.sum(self.npairs))]
         self.tot += cat1.weight
 
 
@@ -251,6 +256,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.meanlogr[:] = 0.
         self.weight[:] = 0.
         self.npairs[:] = 0.
+        self.idxpairs[:] = 0
         self.tot = 0.
 
     def __iadd__(self, other):
@@ -271,6 +277,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.meanlogr[:] += other.meanlogr[:]
         self.weight[:] += other.weight[:]
         self.npairs[:] += other.npairs[:]
+        self.idxpairs[:] += other.idxpairs[:]
         self.tot += other.tot
         return self
 
@@ -506,6 +513,8 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.meanlogr = data['meanlogR']
         self.weight = data['DD']
         self.npairs = data['npairs']
+        self.idxpairs = data['idxpairs']
+
         self._build_corr()
 
 

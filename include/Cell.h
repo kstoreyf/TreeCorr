@@ -50,12 +50,16 @@ class CellData<NData,C>
 public:
     CellData() {}
 
-    CellData(const Position<C>& pos, double w, double wpos) :
-        _pos(pos), _w(w), _wpos(wpos), _n(w != 0.) {}
+    CellData(const Position<C>& pos, double w, double wpos, long idx) :
+        _pos(pos), _w(w), _wpos(wpos), _n(w != 0.) {
+            _idx.push_back(idx);
+        }
 
     template <int C2>
-    CellData(const Position<C2>& pos, double w, double wpos) :
-        _pos(pos), _w(w), _wpos(wpos), _n(w != 0.) {}
+    CellData(const Position<C2>& pos, double w, double wpos, long idx) :
+        _pos(pos), _w(w), _wpos(wpos), _n(w != 0.) {
+             _idx.push_back(idx);
+        }
 
     CellData(const std::vector<CellData<NData,C>*>& vdata,
              size_t start, size_t end);
@@ -67,6 +71,7 @@ public:
     const Position<C>& getPos() const { return _pos; }
     double getW() const { return _w; }
     double getWPos() const { return _wpos; }
+    std::vector<long> getidx() const { return _idx; }
     long getN() const { return _n; }
 
 private:
@@ -74,6 +79,7 @@ private:
     Position<C> _pos;
     float _w;
     float _wpos;
+    std::vector<long> _idx;
     long _n;
 };
 
@@ -87,14 +93,18 @@ class CellData<KData,C>
 public:
     CellData() {}
 
-    CellData(const Position<C>& pos, double k, double w, double wpos) :
+    CellData(const Position<C>& pos, double k, double w, double wpos, long idx) :
         _pos(pos), _wk(w*k), _w(w), _wpos(wpos), _n(w != 0.)
-    {}
+    {
+         _idx.push_back(idx);
+    }
 
     template <int C2>
-    CellData(const Position<C2>& pos, double k, double w, double wpos) :
+    CellData(const Position<C2>& pos, double k, double w, double wpos, long idx) :
         _pos(pos), _wk(w*k), _w(w), _wpos(wpos), _n(w != 0.)
-    {}
+    {
+         _idx.push_back(idx);
+    }
 
     CellData(const std::vector<CellData<KData,C>*>& vdata, size_t start, size_t end);
 
@@ -106,6 +116,8 @@ public:
     double getWK() const { return _wk; }
     double getW() const { return _w; }
     double getWPos() const { return _wpos; }
+    std::vector<long> getidx() const { return _idx; }
+    //std::vector<long> getidx() const { return _idx; }
     long getN() const { return _n; }
 
 private:
@@ -114,6 +126,7 @@ private:
     float _wk;
     float _w;
     float _wpos;
+    std::vector<long> _idx;
     long _n;
 };
 
@@ -127,14 +140,18 @@ class CellData<GData,C>
 public:
     CellData() {}
 
-    CellData(const Position<C>& pos, const std::complex<double>& g, double w, double wpos) :
+    CellData(const Position<C>& pos, const std::complex<double>& g, double w, double wpos, long idx) :
         _pos(pos), _wg(w*g), _w(w), _wpos(wpos), _n(w != 0.)
-    {}
+    {
+         _idx.push_back(idx);
+    }
 
     template <int C2>
-    CellData(const Position<C2>& pos, const std::complex<double>& g, double w, double wpos) :
+    CellData(const Position<C2>& pos, const std::complex<double>& g, double w, double wpos, long idx) :
         _pos(pos), _wg(w*g), _w(w), _wpos(wpos), _n(w != 0.)
-    {}
+    {
+         _idx.push_back(idx);
+    }
 
     CellData(const std::vector<CellData<GData,C>*>& vdata, size_t start, size_t end);
 
@@ -146,6 +163,7 @@ public:
     std::complex<double> getWG() const { return _wg; }
     double getW() const { return _w; }
     double getWPos() const { return _wpos; }
+    std::vector<long> getidx() const { return _idx; }
     long getN() const { return _n; }
 
 private:
@@ -154,6 +172,7 @@ private:
     std::complex<float> _wg;
     float _w;
     float _wpos;
+    std::vector<long> _idx;
     long _n;
 };
 
@@ -198,6 +217,8 @@ public:
     const Position<C>& getPos() const { return _data->getPos(); }
     double getW() const { return _data->getW(); }
     double getWPos() const { return _data->getWPos(); }
+    std::vector<long> getidx() const { return _data->getidx(); }
+    //std::vector<long> getidx() { return _data->getidx(); }
     long getN() const { return _data->getN(); }
 
     double getSize() const { return _size; }

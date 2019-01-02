@@ -258,6 +258,12 @@ def double_ptr(x):
     # This works, presumably by ignoring the numpy read_only flag.  Although, I think it's ok.
     return treecorr._ffi.cast('double*', x.ctypes.data)
 
+def long_ptr(x):
+    return treecorr._ffi.cast('long*', x.ctypes.data)
+
+def veclong_ptr(x):
+    return treecorr._ffi.cast('vector<long>*', x.ctypes.data)
+
 def parse_metric(metric, coords, coords2=None, coords3=None):
     """
     Convert a string metric into the corresponding enum to pass to the C code.

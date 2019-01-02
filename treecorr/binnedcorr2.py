@@ -151,6 +151,8 @@ class BinnedCorr2(object):
                 'The minimum separation to include in the output.'),
         'max_sep' : (float, False, None, None,
                 'The maximum separation to include in the output.'),
+        'res_size': (int, False, None, None,
+                    'The buffer size for the pair results.'),
         'sep_units' : (str, False, None, treecorr.angle_units.keys(),
                 'The units to use for min_sep and max_sep.  Also the units of the output distances'),
         'bin_slop' : (float, False, None, None,
@@ -204,6 +206,8 @@ class BinnedCorr2(object):
         self.sep_units = treecorr.config.get(self.config,'sep_units',str,'radians')
         self.sep_unit_name = self.config.get('sep_units','')
         self.log_sep_units = math.log(self.sep_units)
+        self.res_size = int(self.config['res_size'])
+
         if 'nbins' not in self.config:
             if 'max_sep' not in self.config:
                 raise AttributeError("Missing required parameter max_sep")

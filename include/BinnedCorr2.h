@@ -34,7 +34,8 @@ public:
     BinnedCorr2(double minsep, double maxsep, int nbins, double binsize, double b,
                 double minrpar, double maxrpar,
                 double* xi0, double* xi1, double* xi2, double* xi3,
-                double* meanr, double* meanlogr, double* weight, double* npairs);
+                double* meanr, double* meanlogr, double* weight, double* npairs,
+                long* idxpairs);
     BinnedCorr2(const BinnedCorr2& rhs, bool copy_data=true);
     ~BinnedCorr2();
 
@@ -91,6 +92,8 @@ protected:
     double* _meanlogr;
     double* _weight;
     double* _npairs;
+    long* _idxpairs;
+
 };
 
 template <int D1, int D2>

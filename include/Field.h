@@ -39,7 +39,7 @@ class Field
 {
 public:
     Field(double* x, double* y, double* z, double* g1, double* g2, double* k,
-          double* w, double* wpos, long nobj,
+          double* w, double* wpos, long* idx, long nobj,
           double minsize, double maxsize,
           int sm_int, int maxtop);
     ~Field();
@@ -64,7 +64,7 @@ class SimpleField
 {
 public:
     SimpleField(double* x, double* y, double* z, double* g1, double* g2, double* k,
-                double* w, double* wpos, long nobj);
+                double* w, double* wpos, long* idx, long nobj);
     ~SimpleField();
 
     long getNObj() const { return long(_cells.size()); }

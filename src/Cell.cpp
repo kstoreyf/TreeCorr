@@ -38,15 +38,18 @@ double CalculateSizeSq(
     return sizesq;
 }
 
+//TODO: give buildcelldata a vector of longs for idx, starting empty,
+//then append idxs from vdata - will have to see if vdata already has idx, turn to vec
 template <int D, int C>
 void BuildCellData(
     const std::vector<CellData<D,C>*>& vdata, size_t start, size_t end,
-    Position<C>& pos, float& w, long& n)
+    Position<C>& pos, float& w, long& n, std::vector<long>& idx)
 {
     Assert(start < end);
     double wp = vdata[start]->getWPos();
     pos = vdata[start]->getPos() * wp;
     w = vdata[start]->getW();
+    idx = vdata[start]->getidx();
     n = (w != 0);
     double sumwp = wp;
     for(size_t i=start+1; i!=end; ++i) {
@@ -54,6 +57,8 @@ void BuildCellData(
         pos += data.getPos() * wp;
         sumwp += wp;
         w += data.getW();
+        //TODO: loop through getidx to push onto new vec
+        for (size_t s=0; s<data.getidx().size(); s++) idx.push_back(data.getidx()[s]);
         if (data.getW() != 0.) ++n;
     }
     if (sumwp > 0.) {
@@ -73,19 +78,25 @@ template <int C>
 CellData<NData,C>::CellData(
     const std::vector<CellData<NData,C>*>& vdata, size_t start, size_t end) :
     _w(0.), _n(0)
-{ BuildCellData(vdata,start,end,_pos,_w,_n); }
+{   std::vector<long> _idx;
+    BuildCellData(vdata,start,end,_pos,_w,_n,_idx);
+    //This is hacky but I can't figure out how else to assign!!
+    this->_idx = _idx;
+    }
 
 template <int C>
 CellData<KData,C>::CellData(
     const std::vector<CellData<KData,C>*>& vdata, size_t start, size_t end) :
     _wk(0.), _w(0.), _n(0)
-{ BuildCellData(vdata,start,end,_pos,_w,_n); }
+{   std::vector<long> _idx;
+    BuildCellData(vdata,start,end,_pos,_w,_n,_idx); }
 
 template <int C>
 CellData<GData,C>::CellData(
     const std::vector<CellData<GData,C>*>& vdata, size_t start, size_t end) :
     _wg(0.), _w(0.), _n(0)
-{ BuildCellData(vdata,start,end,_pos,_w,_n); }
+{   std::vector<long> _idx;
+    BuildCellData(vdata,start,end,_pos,_w,_n,_idx); }
 
 template <int C>
 void CellData<KData,C>::finishAverages(

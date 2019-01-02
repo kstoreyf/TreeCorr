@@ -43,7 +43,7 @@ extern void* BuildNFieldFlat(double* x, double* y,
                              double minsize, double maxsize,
                              int sm_int, int maxtop);
 extern void* BuildNField3D(double* x, double* y, double* z,
-                           double* w, double* wpos, long nobj,
+                           double* w, double* wpos, long* idx, long nobj,
                            double minsize, double maxsize,
                            int sm_int, int maxtop);
 extern void* BuildNFieldSphere(double* x, double* y, double* z,

@@ -354,7 +354,7 @@ class Catalog(object):
     }
     def __init__(self, file_name=None, config=None, num=0, logger=None, is_rand=False,
                  x=None, y=None, z=None, ra=None, dec=None, r=None, w=None, wpos=None, flag=None,
-                 g1=None, g2=None, k=None, **kwargs):
+                 g1=None, g2=None, k=None, idx=None, **kwargs):
 
         self.config = treecorr.config.merge_config(config,kwargs,Catalog._valid_params)
         self.orig_config = config
@@ -381,6 +381,7 @@ class Catalog(object):
         self.g1 = None
         self.g2 = None
         self.k = None
+        self.idx = None
 
         # Some dicts to store fields that get made.  Indexed by the args used to make the fields.
         self.nfields = {}
@@ -443,6 +444,7 @@ class Catalog(object):
             self.g1 = self.makeArray(g1,'g1')
             self.g2 = self.makeArray(g2,'g2')
             self.k = self.makeArray(k,'k')
+            self.idx = self.makeArray(idx,'idx',dtype=long)
 
         # Apply units to x,y,ra,dec
         if self.x is not None:
@@ -517,6 +519,7 @@ class Catalog(object):
         if self.g1 is not None: self.g1 = self.g1[start:end]
         if self.g2 is not None: self.g2 = self.g2[start:end]
         if self.k is not None: self.k = self.k[start:end]
+        if self.idx is not None: self.idx = self.idx[start:end]
 
         # Check that all columns have the same length:
         if self.x is not None: 
@@ -543,6 +546,8 @@ class Catalog(object):
             raise ValueError("g1 has the wrong numbers of elements")
         if self.k is not None and len(self.k) != self.ntot:
             raise ValueError("k has the wrong numbers of elements")
+        if self.idx is not None and len(self.idx) != self.ntot:
+            raise ValueError("idx has the wrong numbers of elements")
 
         # Check for NaN's:
         self.checkForNaN(self.x,'x')
@@ -556,6 +561,7 @@ class Catalog(object):
         self.checkForNaN(self.k,'k')
         self.checkForNaN(self.w,'w')
         self.checkForNaN(self.wpos,'wpos')
+        self.checkForNaN(self.idx,'idx')
 
         # Calculate some summary parameters here that will typically be needed
         if self.w is not None:

@@ -16,6 +16,7 @@
 #include "BinnedCorr2.h"
 #include "Split.h"
 #include "ProjectHelper.h"
+#include <numeric>
 
 #ifdef _OPENMP
 #include "omp.h"
@@ -30,11 +31,13 @@ BinnedCorr2<D1,D2>::BinnedCorr2(
     double minsep, double maxsep, int nbins, double binsize, double b,
     double minrpar, double maxrpar,
     double* xi0, double* xi1, double* xi2, double* xi3,
-    double* meanr, double* meanlogr, double* weight, double* npairs) :
+    double* meanr, double* meanlogr, double* weight, double* npairs,
+    long* idxpairs) :
     _minsep(minsep), _maxsep(maxsep), _nbins(nbins), _binsize(binsize), _b(b),
     _minrpar(minrpar), _maxrpar(maxrpar),
     _coords(-1), _owns_data(false),
-    _xi(xi0,xi1,xi2,xi3), _meanr(meanr), _meanlogr(meanlogr), _weight(weight), _npairs(npairs)
+    _xi(xi0,xi1,xi2,xi3), _meanr(meanr), _meanlogr(meanlogr), _weight(weight), _npairs(npairs),
+    _idxpairs(idxpairs)
 {
     // Some helpful variables we can calculate once here.
     _logminsep = log(_minsep);
@@ -59,6 +62,8 @@ BinnedCorr2<D1,D2>::BinnedCorr2(const BinnedCorr2<D1,D2>& rhs, bool copy_data) :
     _meanlogr = new double[_nbins];
     _weight = new double[_nbins];
     _npairs = new double[_nbins];
+    //_idxpairs = new std::vector<long>;
+    _idxpairs = new long[0];
 
     if (copy_data) *this = rhs;
     else clear();
@@ -73,6 +78,8 @@ BinnedCorr2<D1,D2>::~BinnedCorr2()
         delete [] _meanlogr; _meanlogr = 0;
         delete [] _weight; _weight = 0;
         delete [] _npairs; _npairs = 0;
+        delete [] _idxpairs; _idxpairs = 0;
+
     }
 }
 
@@ -94,11 +101,14 @@ struct ProcessHelper<D,D,C,M>
 template <int D1, int D2>
 void BinnedCorr2<D1,D2>::clear()
 {
+    int npairs_tot = std::accumulate(_npairs, _npairs+_nbins,0);
     _xi.clear(_nbins);
     for (int i=0; i<_nbins; ++i) _meanr[i] = 0.;
     for (int i=0; i<_nbins; ++i) _meanlogr[i] = 0.;
     for (int i=0; i<_nbins; ++i) _weight[i] = 0.;
     for (int i=0; i<_nbins; ++i) _npairs[i] = 0.;
+    for (int i=0; i<npairs_tot; ++i) _idxpairs[i] = -1;
+
     _coords = -1;
 }
 
@@ -132,6 +142,7 @@ void BinnedCorr2<D1,D2>::process(const Field<D1,C>& field, bool dots)
                 if (dots) std::cout<<'.'<<std::flush;
             }
             const Cell<D1,C>& c1 = *field.getCells()[i];
+
             ProcessHelper<D1,D2,C,M>::process2(bc2,c1);
             for (int j=i+1;j<n1;++j) {
                 const Cell<D1,C>& c2 = *field.getCells()[j];
@@ -456,12 +467,34 @@ void BinnedCorr2<D1,D2>::directProcess11(
     //dbg<<"r,logr,k = "<<r<<','<<logr<<','<<k<<std::endl;
 
     double nn = double(c1.getN()) * double(c2.getN());
+
+    int nnint = c1.getN()*c2.getN();
+    long* idxnew = new long[nnint];
+
+    int idxpairs_len = std::accumulate(_npairs, _npairs+_nbins,0);
     _npairs[k] += nn;
 
     double ww = double(c1.getW()) * double(c2.getW());
     _meanr[k] += ww * r;
     _meanlogr[k] += ww * logr;
     _weight[k] += ww;
+
+    for (int ii=0; ii<c1.getN(); ++ii) {
+        for (int jj=0; jj<c2.getN(); ++jj) {
+            idxnew[ii + jj*c1.getN()] = c1.getidx()[ii];
+            //idxnew2[jj+ii*c2.getN()] = c2.getidx()[ii];
+        }
+    }
+
+    int idxnew_size = nnint;
+    int idxpairs_size = idxpairs_len;
+
+    long* result = new long[idxnew_size + idxpairs_size];
+    std::copy(_idxpairs, _idxpairs + idxpairs_size, result);
+    std::copy(idxnew, idxnew + idxnew_size, result + idxpairs_size);
+    delete[] _idxpairs;
+    _idxpairs = result;
+    //std::cout << "idxcheck" << _idxpairs[10] << std::endl;
     //dbg<<"n,w = "<<nn<<','<<ww<<" ==>  "<<_npairs[k]<<','<<_weight[k]<<std::endl;
 
     DirectHelper<D1,D2>::template ProcessXi<C,M>(c1,c2,dsq,_xi,k);
@@ -476,17 +509,25 @@ void BinnedCorr2<D1,D2>::operator=(const BinnedCorr2<D1,D2>& rhs)
     for (int i=0; i<_nbins; ++i) _meanlogr[i] = rhs._meanlogr[i];
     for (int i=0; i<_nbins; ++i) _weight[i] = rhs._weight[i];
     for (int i=0; i<_nbins; ++i) _npairs[i] = rhs._npairs[i];
+    int npairs_tot = std::accumulate(_npairs, _npairs+_nbins,0);
+    for (int i=0; i<npairs_tot; ++i) _idxpairs[i] = rhs._idxpairs[i];
+
 }
 
 template <int D1, int D2>
 void BinnedCorr2<D1,D2>::operator+=(const BinnedCorr2<D1,D2>& rhs)
 {
+
     Assert(rhs._nbins == _nbins);
     _xi.add(rhs._xi,_nbins);
     for (int i=0; i<_nbins; ++i) _meanr[i] += rhs._meanr[i];
     for (int i=0; i<_nbins; ++i) _meanlogr[i] += rhs._meanlogr[i];
     for (int i=0; i<_nbins; ++i) _weight[i] += rhs._weight[i];
+    int npairs_prev = std::accumulate(_npairs, _npairs+_nbins,0);
+    int npairs_new = std::accumulate(rhs._npairs, rhs._npairs+_nbins,0);
     for (int i=0; i<_nbins; ++i) _npairs[i] += rhs._npairs[i];
+    for (int i=0; i<npairs_new; ++i) _idxpairs[npairs_prev+i] = rhs._idxpairs[i];
+
 }
 
 //
@@ -501,14 +542,18 @@ extern "C" {
 
 void* BuildNNCorr(double minsep, double maxsep, int nbins, double binsize, double b,
                   double minrpar, double maxrpar,
-                  double* meanr, double* meanlogr, double* weight, double* npairs)
+                  double* meanr, double* meanlogr, double* weight, double* npairs, long* idxpairs)
 {
+
     dbg<<"Start BuildNNCorr\n";
-    void* corr = static_cast<void*>(new BinnedCorr2<NData,NData>(
-            minsep, maxsep, nbins, binsize, b,
-            minrpar, maxrpar,
-            0, 0, 0, 0,
-            meanr, meanlogr, weight, npairs));
+    BinnedCorr2<NData,NData>* corr;
+
+    corr = new BinnedCorr2<NData,NData>(
+        minsep, maxsep, nbins, binsize, b,
+        minrpar, maxrpar,
+        0, 0, 0, 0,
+        meanr, meanlogr, weight, npairs, idxpairs);
+
     xdbg<<"corr = "<<corr<<std::endl;
     return corr;
 }
@@ -516,14 +561,14 @@ void* BuildNNCorr(double minsep, double maxsep, int nbins, double binsize, doubl
 void* BuildNKCorr(double minsep, double maxsep, int nbins, double binsize, double b,
                   double minrpar, double maxrpar,
                   double* xi,
-                  double* meanr, double* meanlogr, double* weight, double* npairs)
+                  double* meanr, double* meanlogr, double* weight, double* npairs, long* idxpairs)
 {
     dbg<<"Start BuildNKCorr\n";
     void* corr = static_cast<void*>(new BinnedCorr2<NData,KData>(
             minsep, maxsep, nbins, binsize, b,
             minrpar, maxrpar,
             xi, 0, 0, 0,
-            meanr, meanlogr, weight, npairs));
+            meanr, meanlogr, weight, npairs, idxpairs));
     xdbg<<"corr = "<<corr<<std::endl;
     return corr;
 }
@@ -531,14 +576,14 @@ void* BuildNKCorr(double minsep, double maxsep, int nbins, double binsize, doubl
 void* BuildNGCorr(double minsep, double maxsep, int nbins, double binsize, double b,
                   double minrpar, double maxrpar,
                   double* xi, double* xi_im,
-                  double* meanr, double* meanlogr, double* weight, double* npairs)
+                  double* meanr, double* meanlogr, double* weight, double* npairs, long* idxpairs)
 {
     dbg<<"Start BuildNGCorr\n";
     void* corr = static_cast<void*>(new BinnedCorr2<NData,GData>(
             minsep, maxsep, nbins, binsize, b,
             minrpar, maxrpar,
             xi, xi_im, 0, 0,
-            meanr, meanlogr, weight, npairs));
+            meanr, meanlogr, weight, npairs, idxpairs));
     xdbg<<"corr = "<<corr<<std::endl;
     return corr;
 }
@@ -546,14 +591,14 @@ void* BuildNGCorr(double minsep, double maxsep, int nbins, double binsize, doubl
 void* BuildKKCorr(double minsep, double maxsep, int nbins, double binsize, double b,
                   double minrpar, double maxrpar,
                   double* xi,
-                  double* meanr, double* meanlogr, double* weight, double* npairs)
+                  double* meanr, double* meanlogr, double* weight, double* npairs, long* idxpairs)
 {
     dbg<<"Start BuildKKCorr\n";
     void* corr = static_cast<void*>(new BinnedCorr2<KData,KData>(
             minsep, maxsep, nbins, binsize, b,
             minrpar, maxrpar,
             xi, 0, 0, 0,
-            meanr, meanlogr, weight, npairs));
+            meanr, meanlogr, weight, npairs, idxpairs));
     xdbg<<"corr = "<<corr<<std::endl;
     return corr;
 }
@@ -561,14 +606,14 @@ void* BuildKKCorr(double minsep, double maxsep, int nbins, double binsize, doubl
 void* BuildKGCorr(double minsep, double maxsep, int nbins, double binsize, double b,
                   double minrpar, double maxrpar,
                   double* xi, double* xi_im,
-                  double* meanr, double* meanlogr, double* weight, double* npairs)
+                  double* meanr, double* meanlogr, double* weight, double* npairs, long* idxpairs)
 {
     dbg<<"Start BuildKGCorr\n";
     void* corr = static_cast<void*>(new BinnedCorr2<KData,GData>(
             minsep, maxsep, nbins, binsize, b,
             minrpar, maxrpar,
             xi, xi_im, 0, 0,
-            meanr, meanlogr, weight, npairs));
+            meanr, meanlogr, weight, npairs, idxpairs));
     xdbg<<"corr = "<<corr<<std::endl;
     return corr;
 }
@@ -576,14 +621,14 @@ void* BuildKGCorr(double minsep, double maxsep, int nbins, double binsize, doubl
 void* BuildGGCorr(double minsep, double maxsep, int nbins, double binsize, double b,
                   double minrpar, double maxrpar,
                   double* xip, double* xip_im, double* xim, double* xim_im,
-                  double* meanr, double* meanlogr, double* weight, double* npairs)
+                  double* meanr, double* meanlogr, double* weight, double* npairs, long* idxpairs)
 {
     dbg<<"Start BuildGGCorr\n";
     void* corr = static_cast<void*>(new BinnedCorr2<GData,GData>(
             minsep, maxsep, nbins, binsize, b,
             minrpar, maxrpar,
             xip, xip_im, xim, xim_im,
-            meanr, meanlogr, weight, npairs));
+            meanr, meanlogr, weight, npairs, idxpairs));
     xdbg<<"corr = "<<corr<<std::endl;
     return corr;
 }
@@ -633,6 +678,7 @@ void DestroyGGCorr(void* corr)
 
 void ProcessAutoNN(void* corr, void* field, int dots, int coord, int metric)
 {
+
     dbg<<"Start ProcessAutoNN\n";
     if (coord == Flat) {
         if (metric == Euclidean)
