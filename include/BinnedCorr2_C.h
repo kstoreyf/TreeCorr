@@ -13,31 +13,31 @@
  */
 
 extern void* BuildNNCorr(double minsep, double maxsep, int nbins, double binsize, double b,
-                         double minrpar, double maxrpar,
+                         double minrpar, double maxrpar, int res_size,
                          double* meanr, double* meanlogr, double* weight, double* npairs,
                          long* idxpairs);
 extern void* BuildNKCorr(double minsep, double maxsep, int nbins, double binsize, double b,
-                         double minrpar, double maxrpar,
+                         double minrpar, double maxrpar, int res_size,
                          double* xi,
                          double* meanr, double* meanlogr, double* weight, double* npairs,
                          long* idxpairs);
 extern void* BuildNGCorr(double minsep, double maxsep, int nbins, double binsize, double b,
-                         double minrpar, double maxrpar,
+                         double minrpar, double maxrpar, int res_size,
                          double* xi, double* xi_im,
                          double* meanr, double* meanlogr, double* weight, double* npairs,
                          long* idxpairs);
 extern void* BuildKKCorr(double minsep, double maxsep, int nbins, double binsize, double b,
-                         double minrpar, double maxrpar,
+                         double minrpar, double maxrpar, int res_size,
                          double* xi,
                          double* meanr, double* meanlogr, double* weight, double* npairs,
                          long* idxpairs);
 extern void* BuildKGCorr(double minsep, double maxsep, int nbins, double binsize, double b,
-                         double minrpar, double maxrpar,
+                         double minrpar, double maxrpar, int res_size,
                          double* xi, double* xi_im,
                          double* meanr, double* meanlogr, double* weight, double* npairs,
                          long* idxpairs);
 extern void* BuildGGCorr(double minsep, double maxsep, int nbins, double binsize, double b,
-                         double minrpar, double maxrpar,
+                         double minrpar, double maxrpar, int res_size,
                          double* xip, double* xip_im, double* xim, double* xim_im,
                          double* meanr, double* meanlogr, double* weight, double* npairs,
                          long* idxpairs);

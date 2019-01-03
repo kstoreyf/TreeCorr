@@ -32,7 +32,7 @@ class BinnedCorr2
 public:
 
     BinnedCorr2(double minsep, double maxsep, int nbins, double binsize, double b,
-                double minrpar, double maxrpar,
+                double minrpar, double maxrpar, int res_size,
                 double* xi0, double* xi1, double* xi2, double* xi3,
                 double* meanr, double* meanlogr, double* weight, double* npairs,
                 long* idxpairs);
@@ -72,6 +72,7 @@ protected:
     double _b;
     double _minrpar;
     double _maxrpar;
+    int _res_size;
     double _logminsep;
     double _halfminsep;
     double _minsepsq;

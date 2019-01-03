@@ -88,7 +88,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         from treecorr.util import long_ptr as lp
         self.corr = treecorr._lib.BuildNNCorr(
                 self._min_sep,self._max_sep,self.nbins,self.bin_size,self.b,
-                self.min_rpar, self.max_rpar,
+                self.min_rpar, self.max_rpar, self.res_size,
                 dp(self.meanr),dp(self.meanlogr),dp(self.weight),dp(self.npairs),
                 lp(self.idxpairs));
 
