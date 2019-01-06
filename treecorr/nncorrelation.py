@@ -267,9 +267,9 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.meanlogr[:] = 0.
         self.weight[:] = 0.
         self.npairs[:] = 0.
-        self.idxpairs1[:] = 0
-        self.idxpairs2[:] = 0
-        self.dists[:] = 0
+        self.idxpairs1[:] = -1
+        self.idxpairs2[:] = -1
+        self.dists[:] = -1.
         self.tot = 0.
 
     def __iadd__(self, other):

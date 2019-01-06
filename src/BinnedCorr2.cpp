@@ -75,7 +75,6 @@ BinnedCorr2<D1,D2>::~BinnedCorr2()
 {
     if (_owns_data) {
         _xi.delete_data(_nbins);
-        _xi.delete_data(_res_size);
         delete [] _meanr; _meanr = 0;
         delete [] _meanlogr; _meanlogr = 0;
         delete [] _weight; _weight = 0;
@@ -83,7 +82,6 @@ BinnedCorr2<D1,D2>::~BinnedCorr2()
         delete [] _idxpairs1; _idxpairs1 = 0;
         delete [] _idxpairs2; _idxpairs2 = 0;
         delete [] _dists; _dists = 0;
-
     }
 }
 
@@ -107,14 +105,13 @@ void BinnedCorr2<D1,D2>::clear()
 {
     int npairs_tot = std::accumulate(_npairs, _npairs+_nbins,0);
     _xi.clear(_nbins);
-    _xi.clear(_res_size);
     for (int i=0; i<_nbins; ++i) _meanr[i] = 0.;
     for (int i=0; i<_nbins; ++i) _meanlogr[i] = 0.;
     for (int i=0; i<_nbins; ++i) _weight[i] = 0.;
     for (int i=0; i<_nbins; ++i) _npairs[i] = 0.;
     for (int i=0; i<npairs_tot; ++i) _idxpairs1[i] = -1;
     for (int i=0; i<npairs_tot; ++i) _idxpairs2[i] = -1;
-    for (int i=0; i<npairs_tot; ++i) _dists[i] = -1;
+    for (int i=0; i<npairs_tot; ++i) _dists[i] = -1.;
     _coords = -1;
 }
 

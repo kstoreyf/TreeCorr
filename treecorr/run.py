@@ -6,9 +6,11 @@ import time
 
 import treecorr
 
-
-
-nd = 10
+#nd = 10
+#nd = 102
+#nd = 307
+#nd = 1012
+nd = 3158
 
 print 'Loading data'
 data1fn = '../../lss/mangler/samples/a0.6452_0001.v5_ngc_ifield_ndata{}.rdzw'.format(nd)
@@ -45,6 +47,8 @@ min_sep = 0.5
 max_sep = 2.
 K = 10
 bin_size = np.log(max_sep / min_sep) / float(K)
+# Note that pimax might not be very exact (see treecorr issue) so may need wiggle room
+pimax = 40.
 
 print 'Processing'
 cat_data = treecorr.Catalog(ra=ra, dec=dec, r=dist, idx=idx, ra_units='deg', dec_units='deg')
@@ -52,30 +56,30 @@ cat_rand = treecorr.Catalog(ra=ra_rand, dec=dec_rand, r=dist_rand, idx=idx_rand,
 
 start = time.time()
 dd = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, bin_size=bin_size,
-                            res_size=ndata**2)
+                            res_size=ndata**2, min_rpar=-pimax, max_rpar=pimax)
 dd.process(cat_data, metric='Rperp')
 print dd.npairs
-print dd.idxpairs1
-print dd.idxpairs2
-print dd.dists
+#print dd.idxpairs1
+#print dd.idxpairs2
+#print dd.dists
 print len(dd.idxpairs1)
 print
-# dr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, bin_size=bin_size,
-#                             res_size=ndata*nrand)
-# dr.process(cat_data, cat_rand, metric='Rperp')
-# print dr.npairs
-# print dr.idxpairs
-# print len(dr.idxpairs)
-# print
-# rr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, bin_size=bin_size,
-#                             res_size=nrand**2)
-# rr.process(cat_rand, metric='Rperp')
-# print rr.npairs
-# print rr.idxpairs
-# print len(rr.idxpairs)
+dr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, bin_size=bin_size,
+                            res_size=ndata*nrand, min_rpar=-pimax, max_rpar=pimax)
+dr.process(cat_data, cat_rand, metric='Rperp')
+print dr.npairs
+# print dr.idxpairs1
+print len(dr.idxpairs1)
+print
+rr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, bin_size=bin_size,
+                            res_size=nrand**2, min_rpar=-pimax, max_rpar=pimax)
+rr.process(cat_rand, metric='Rperp')
+print rr.npairs
+# print rr.idxpairs1
+print len(rr.idxpairs1)
 
-# xi, varxi = dd.calculateXi(rr, dr)
-# print xi
+xi, varxi = dd.calculateXi(rr, dr)
+print xi
 
 end = time.time()
 print "Time:", end-start
