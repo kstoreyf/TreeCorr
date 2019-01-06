@@ -283,7 +283,7 @@ class BinnedCorr2(object):
             self.logger.debug("Using bin_slop = %g, b = %g",self.bin_slop,self.b)
 
         # This makes nbins evenly spaced entries in log(r) starting with 0 with step bin_size
-        self.logr = numpy.linspace(start=0, stop=self.nbins*self.bin_size, 
+        self.logr = numpy.linspace(start=0, stop=self.nbins*self.bin_size,
                                    num=self.nbins, endpoint=False)
         # Offset by the position of the center of the first bin.
         self.logr += math.log(self.min_sep) + 0.5*self.bin_size
