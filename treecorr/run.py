@@ -42,7 +42,7 @@ idx = np.arange(ndata, dtype=long)
 idx_rand = np.arange(nrand, dtype=long)
 
 min_sep = 0.5
-max_sep = 20.
+max_sep = 2.
 K = 10
 bin_size = np.log(max_sep / min_sep) / float(K)
 
@@ -57,6 +57,7 @@ dd.process(cat_data, metric='Rperp')
 print dd.npairs
 print dd.idxpairs1
 print dd.idxpairs2
+print dd.dists
 print len(dd.idxpairs1)
 print
 # dr = treecorr.NNCorrelation(min_sep=min_sep, max_sep=max_sep, bin_size=bin_size,

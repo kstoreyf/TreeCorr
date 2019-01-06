@@ -35,7 +35,7 @@ public:
                 double minrpar, double maxrpar, int res_size,
                 double* xi0, double* xi1, double* xi2, double* xi3,
                 double* meanr, double* meanlogr, double* weight, double* npairs,
-                long* idxpairs1, long* idxpairs2);
+                long* idxpairs1, long* idxpairs2, double* dists);
     BinnedCorr2(const BinnedCorr2& rhs, bool copy_data=true);
     ~BinnedCorr2();
 
@@ -95,6 +95,7 @@ protected:
     double* _npairs;
     long* _idxpairs1;
     long* _idxpairs2;
+    double* _dists;
 
 };
 

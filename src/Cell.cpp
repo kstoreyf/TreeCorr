@@ -38,18 +38,18 @@ double CalculateSizeSq(
     return sizesq;
 }
 
-//TODO: give buildcelldata a vector of longs for idx, starting empty,
-//then append idxs from vdata - will have to see if vdata already has idx, turn to vec
 template <int D, int C>
 void BuildCellData(
     const std::vector<CellData<D,C>*>& vdata, size_t start, size_t end,
-    Position<C>& pos, float& w, long& n, std::vector<long>& idx)
+    Position<C>& pos, float& w, long& n, std::vector<long>& idx,
+    std::vector<Position<C> >& positions)
 {
     Assert(start < end);
     double wp = vdata[start]->getWPos();
     pos = vdata[start]->getPos() * wp;
     w = vdata[start]->getW();
     idx = vdata[start]->getidx();
+    positions = vdata[start]->getpositions();
     n = (w != 0);
     double sumwp = wp;
     for(size_t i=start+1; i!=end; ++i) {
@@ -57,8 +57,11 @@ void BuildCellData(
         pos += data.getPos() * wp;
         sumwp += wp;
         w += data.getW();
-        //TODO: loop through getidx to push onto new vec
-        for (size_t s=0; s<data.getidx().size(); s++) idx.push_back(data.getidx()[s]);
+        //Loop through existing indices and positions to push onto new vector
+        for (size_t s=0; s<data.getidx().size(); s++) {
+            idx.push_back(data.getidx()[s]);
+            positions.push_back(data.getpositions()[s]);
+        }
         if (data.getW() != 0.) ++n;
     }
     if (sumwp > 0.) {
@@ -79,9 +82,11 @@ CellData<NData,C>::CellData(
     const std::vector<CellData<NData,C>*>& vdata, size_t start, size_t end) :
     _w(0.), _n(0)
 {   std::vector<long> _idx;
-    BuildCellData(vdata,start,end,_pos,_w,_n,_idx);
+    std::vector<Position<C> > _positions;
+    BuildCellData(vdata,start,end,_pos,_w,_n,_idx,_positions);
     //This is hacky but I can't figure out how else to assign!!
     this->_idx = _idx;
+    this->_positions = _positions;
     }
 
 template <int C>
@@ -89,14 +94,22 @@ CellData<KData,C>::CellData(
     const std::vector<CellData<KData,C>*>& vdata, size_t start, size_t end) :
     _wk(0.), _w(0.), _n(0)
 {   std::vector<long> _idx;
-    BuildCellData(vdata,start,end,_pos,_w,_n,_idx); }
+    std::vector<Position<C> > _positions;
+    BuildCellData(vdata,start,end,_pos,_w,_n,_idx,_positions);
+    this->_idx = _idx;
+    this->_positions = _positions;
+    }
 
 template <int C>
 CellData<GData,C>::CellData(
     const std::vector<CellData<GData,C>*>& vdata, size_t start, size_t end) :
     _wg(0.), _w(0.), _n(0)
 {   std::vector<long> _idx;
-    BuildCellData(vdata,start,end,_pos,_w,_n,_idx); }
+    std::vector<Position<C> > _positions;
+    BuildCellData(vdata,start,end,_pos,_w,_n,_idx,_positions);
+    this->_idx = _idx;
+    this->_positions = _positions;
+    }
 
 template <int C>
 void CellData<KData,C>::finishAverages(

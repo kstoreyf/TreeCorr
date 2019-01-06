@@ -79,6 +79,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.npairs = numpy.zeros(self.nbins, dtype=float)
         self.idxpairs1 = numpy.full(self.res_size, -1, dtype=long)
         self.idxpairs2 = numpy.full(self.res_size, -1, dtype=long)
+        self.dists = numpy.full(self.res_size, -1, dtype=float)
 
         self.tot = 0.
         self._build_corr()
@@ -91,7 +92,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
                 self._min_sep,self._max_sep,self.nbins,self.bin_size,self.b,
                 self.min_rpar, self.max_rpar, self.res_size,
                 dp(self.meanr),dp(self.meanlogr),dp(self.weight),dp(self.npairs),
-                lp(self.idxpairs1), lp(self.idxpairs2));
+                lp(self.idxpairs1), lp(self.idxpairs2), dp(self.dists));
 
     def __del__(self):
         # Using memory allocated from the C layer means we have to explicitly deallocate it
@@ -152,6 +153,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         npairs_tot = int(numpy.sum(self.npairs))
         self.idxpairs1 = self.idxpairs1[:npairs_tot]
         self.idxpairs2 = self.idxpairs2[:npairs_tot]
+        self.dists = self.dists[:npairs_tot]
         self.tot += 0.5 * cat.sumw**2
 
 
@@ -193,6 +195,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         npairs_tot = int(numpy.sum(self.npairs))
         self.idxpairs1 = self.idxpairs1[:npairs_tot]
         self.idxpairs2 = self.idxpairs2[:npairs_tot]
+        self.dists = self.dists[:npairs_tot]
         self.tot += cat1.sumw*cat2.sumw
 
 
@@ -232,6 +235,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         npairs_tot = int(numpy.sum(self.npairs))
         self.idxpairs1 = self.idxpairs1[:npairs_tot]
         self.idxpairs2 = self.idxpairs2[:npairs_tot]
+        self.dists = self.dists[:npairs_tot]
         self.tot += cat1.weight
 
 
@@ -265,6 +269,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.npairs[:] = 0.
         self.idxpairs1[:] = 0
         self.idxpairs2[:] = 0
+        self.dists[:] = 0
         self.tot = 0.
 
     def __iadd__(self, other):
@@ -287,6 +292,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.npairs[:] += other.npairs[:]
         self.idxpairs1[:] += other.idxpairs1[:]
         self.idxpairs2[:] += other.idxpairs2[:]
+        self.dists[:] += other.dists[:]
         self.tot += other.tot
         return self
 
@@ -524,6 +530,7 @@ class NNCorrelation(treecorr.BinnedCorr2):
         self.npairs = data['npairs']
         self.idxpairs1 = data['idxpairs1']
         self.idxpairs2 = data['idxpairs2']
+        self.dists = data['dists']
 
         self._build_corr()
 
